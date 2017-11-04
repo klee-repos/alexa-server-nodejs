@@ -6,7 +6,7 @@ var app = new alexa.app('flip');
 
 
 app.launch(function(request, response) {
-	response.say( 'Welcome. Who wants to do a flip?' ).reprompt( 'Who wants to do a flip?' ).shouldEndSession( false );
+	response.say( 'Welcome my friend. Who wants to do a flip?' ).reprompt( 'Who wants to do a flip?' ).shouldEndSession( false );
 });
 
 app.error = function( exception, request, response ) {
