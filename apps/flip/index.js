@@ -18,7 +18,7 @@ app.error = function( exception, request, response ) {
 
 app.intent('FlipIntent',
   {
-    "slots":{"FirstName":"AMAZON.FirstName"}
+    "slots":{"FirstName":"AMAZON.Person"}
 	,"utterances":[ 
 		"{FirstName} wants to do a flip",
 		"{FirstName}",
