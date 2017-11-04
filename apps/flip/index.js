@@ -1,4 +1,4 @@
-//module.change_code = 1;
+
 'use strict';
 
 var alexa = require('alexa-app');
@@ -6,14 +6,14 @@ var app = new alexa.app('flip');
 
 
 app.launch(function(request, response) {
-	response.say( 'Welcome my friend. Who wants to do a flip?' ).reprompt( 'Who wants to do a flip?' ).shouldEndSession( false );
+	response.say("Welcome my friend. Who wants to do a flip?").reprompt("Who wants to do a flip?").shouldEndSession(false);
 });
 
-app.error = function( exception, request, response ) {
+app.error = function(exception, request, response) {
 	console.log(exception)
 	console.log(request);
 	console.log(response);	
-	response.say( 'The followning error has occurred. ' + error.message);
+	response.say( 'The following error has occurred. ' + error.message);
 };
 
 app.intent('FlipIntent',
