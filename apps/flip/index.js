@@ -26,7 +26,7 @@ app.intent('FlipIntent',
 	]
   },
   function(request,response) {
-    var name = request.slot('name');
+    var name = request.slot('FirstName');
     response.say(name + " wants to do a flip!");
   }
 );
