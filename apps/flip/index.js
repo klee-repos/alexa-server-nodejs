@@ -16,6 +16,8 @@ var Flip = require("./models/flipSchema");
 var uri = process.env.DB_URI;
 var database;
 
+var requestPromise = require('request-promise');
+
 mongoose.connect(uri, {useMongoClient: true}, function(err) {
 	if (err) {
 		console.log("Mongoose error: " + err);
@@ -106,24 +108,13 @@ app.intent("GetScoreIntent",
 		]
 	},
 	function(request, alexaSay) {
-		// requestapi
-		// 	.get('https://alexa-blackjack-gk.herokuapp.com/score')
-		// 	.on('response', function(scoreRes) {
-		// 		console.log(scoreRes);
-		// 		response.say("The score is printed").shouldEndSession(true);
-		// 	});
-		var contentScore;
-		requestapi('https://alexa-blackjack-gk.herokuapp.com/score', function(err, res, body) {
-			var content = JSON.parse(body);
-			console.log(content.score);
-			contentScore = content.score;
-			console.log(alexaSay);
-			//response.say("the score is 4").shouldEndSession(true);
-		})
-		process.sleep(1000);
-		alexaSay.say("the score is " + contentScore);
-		
-
+		return requestPromise('https://alexa-blackjack-gk.herokuapp.com/score')
+			.then(function(res){
+				var score = JSON.parse(res)["score"];
+				alexaSay.say("I think the score is " + score);
+			}).catch(function(err){
+				console.log(err);
+			});
 	}
 )
 
