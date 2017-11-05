@@ -32,7 +32,7 @@ app.intent('FlipIntent',
   }
 );
 
-app.intent("QuoteIntent",
+app.intent("SecretIntent",
 	{
 		"utterances": [
 			"Tell me a secret",
