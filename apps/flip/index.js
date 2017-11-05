@@ -144,25 +144,6 @@ app.intent("SearchIntent",
 	}
 )
 
-// Tells secret message
-app.intent("SecretIntent",
-	{
-		"slots":{},
-		"utterances": [
-			"Tell me a secret",
-			"Yes",
-			"What",
-			"Tell me the secret",
-			"I would love to know the secret",
-			"Yes please"
-		]
-	},
-	function (request, response) {
-		response.say("Gavin loves to do flips!").shouldEndSession(true);
-		database.close();
-	}
-)
-
 // Stops skill
 app.intent("AMAZON.StopIntent",
 	{
