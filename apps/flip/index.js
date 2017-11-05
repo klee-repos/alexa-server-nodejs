@@ -15,13 +15,13 @@ var app = new alexa.app('flip');
 var mongoose = require("mongoose");
 var Flip = require("./models/flipSchema");
 var uri = process.env.DB_URI;
-var database;
+var atlasdb;
 
 mongoose.connect(uri, {useMongoClient: true}, function(err) {
 	if (err) {
 		console.log("Mongoose error: " + err);
 	} else {
-		database = mongoose.connection;
+		atlasdb = mongoose.connection;
 		console.log("Successfully connected to MongoDB Atlas via mongoose");
 	}
 });
@@ -38,28 +38,6 @@ app.error = function(exception, alexaReq, alexaRes) {
 	console.log(alexaRes);	
 	alexaRes.say( 'an error error has occurred.');
 };
-
-// Print all stored requests in command line
-app.intent("GetRequestsIntent", 
-	{
-		"slots": {},
-		"utterances": [
-			"Show request logs",
-			"Show me request logs",
-			"Request logs"
-		]
-	},
-	function (alexaReq, alexaRes) {
-		database.collection('alexa-requests').find().toArray(function(err,result) {
-			if (err) {
-				console.log(err);
-			} else {
-				console.log(result);
-			}
-		})
-		alexaRes.say("I have printed the details in the command line. Who wants to do a flip?").reprompt("Who wants to do a flip?").shouldEndSession(false);
-	}
-)
 
 // Define name of person doing flip
 app.intent('FlipIntent',
@@ -82,7 +60,7 @@ app.intent('FlipIntent',
 	    	if (dbErr) {
 	    		console.log(dbErr);
 	    	} else {
-	    		console.log('Name recorded to database');
+	    		console.log('Name recorded to atlasdb');
 	    	}
 	    })
 	    alexaRes.say(name + " wants to do a flip!");
@@ -90,6 +68,7 @@ app.intent('FlipIntent',
 	}
 );
 
+// Get score from web service
 app.intent("GetScoreIntent",
 	{
 		"slots":{},
@@ -110,6 +89,7 @@ app.intent("GetScoreIntent",
 	}
 )
 
+// Search db to see if person likes to do flips
 app.intent("SearchIntent",
 	{
 		"slots":{"SlotName":"AMAZON.US_FIRST_NAME"},
@@ -134,7 +114,7 @@ app.intent("SearchIntent",
 					console.log(nameQuery + " does not like to do flips.");
 				}
 			}
-		}).then(function(flip) {
+		}).then(function(result) {
 			if (found) {
 				alexaRes.say(nameQuery + " likes to do flips.").shouldEndSession(true);
 			} else {
@@ -152,7 +132,6 @@ app.intent("AMAZON.StopIntent",
 	},
 	function(request, response) {
 		response.say("Goodbye.").shouldEndSession(true);
-		database.close();
 	}
 )
 
