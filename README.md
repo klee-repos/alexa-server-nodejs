@@ -18,4 +18,4 @@ https://alexa-testapp-kl.herokuapp.com/alexa/flip
 * https://www.heroku.com
 
 
-![alt text](https://github.com/lynkr/alexa-server-nodejs/blob/master/img/alexa-request.png "alexa-request")
+![alt text](https://github.com/lynkr/alexa-server-nodejs/blob/master/img/schema-utterances.png "schema-utterances")
