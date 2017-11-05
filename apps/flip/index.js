@@ -28,7 +28,7 @@ mongoose.connect(uri, {useMongoClient: true}, function(err) {
 
 // Launch
 app.launch(function(alexaReq, alexaRes) {
-	alexaRes.say("Who wants to do a flip?").reprompt("Who wants to do a flip?").shouldEndSession(false);
+	alexaRes.say("Welcome to flip. Please tell me a command.").reprompt("Please tell me a command.").shouldEndSession(false);
 });
 
 // Error handling
@@ -64,7 +64,7 @@ app.intent("GetRequestsIntent",
 // Define name of person doing flip
 app.intent('FlipIntent',
   	{
-    	"slots":{"FirstName":"AMAZON.Person"}
+    	"slots":{"FirstName":"AMAZON.US_FIRST_NAME"}
 		,"utterances":[ 
 			"{FirstName} wants to do a flip",
 			"{FirstName}",
@@ -72,13 +72,6 @@ app.intent('FlipIntent',
 		]
   	},
   	function (alexaReq,alexaRes) {
-  		database.collection('alexa-requests').save(alexaReq, function(err, result) {
-	  		if (err) {
-	  			console.log("There was an error saving request to MongoDB Atlas");
-	  		} else {
-	  			console.log("Request saved to MongoDB Atlas");
-	  		}
-	  	});
 	    var name = alexaReq.slot('FirstName');
 	    var myDate = new Date();
 	    var newFlip = Flip({
@@ -89,11 +82,11 @@ app.intent('FlipIntent',
 	    	if (dbErr) {
 	    		console.log(dbErr);
 	    	} else {
-	    		console.log('Flip recorded to database');
+	    		console.log('Name recorded to database');
 	    	}
 	    })
 	    alexaRes.say(name + " wants to do a flip!");
-	    alexaRes.say("Want to know a secret?").reprompt("Want to know a secret?").shouldEndSession(false);
+	    alexaRes.say("Please tell me a another command.").reprompt("Please tell me a another command.").shouldEndSession(false);
 	}
 );
 
@@ -119,7 +112,7 @@ app.intent("GetScoreIntent",
 
 app.intent("SearchIntent",
 	{
-		"slots":{"SlotName":"AMAZON.Person"},
+		"slots":{"SlotName":"AMAZON.US_FIRST_NAME"},
 		"utterances": [
 			"Does {SlotName} like to do flips",
 			"Does {SlotName} like flips"
@@ -143,9 +136,9 @@ app.intent("SearchIntent",
 			}
 		}).then(function(flip) {
 			if (found) {
-				alexaRes.say(nameQuery + " likes to do flips.");
+				alexaRes.say(nameQuery + " likes to do flips.").shouldEndSession(true);
 			} else {
-				alexaRes.say(nameQuery + " does not like to do flips.");
+				alexaRes.say(nameQuery + " does not like to do flips.").shouldEndSession(true);
 			}
 		})
 	}
