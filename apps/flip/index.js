@@ -1,6 +1,7 @@
 
 'use strict';
 
+// Alexa App framework
 var alexa = require('alexa-app');
 var app = new alexa.app('flip');
 
@@ -18,11 +19,12 @@ MongoClient.connect(uri, function(err, db) {
 	}
 })
 
-
+// Launch
 app.launch(function(request, response) {
 	response.say("Who wants to do a flip?").reprompt("Who wants to do a flip?").shouldEndSession(false);
 });
 
+// Error handling
 app.error = function(exception, request, response) {
 	console.log(exception)
 	console.log(request);
@@ -30,6 +32,7 @@ app.error = function(exception, request, response) {
 	response.say( 'The following error has occurred. ' + error.message);
 };
 
+// Print all stored requests in command line
 app.intent("GetRequestsIntent", 
 	{
 		"slots": {},
@@ -51,6 +54,7 @@ app.intent("GetRequestsIntent",
 	}
 )
 
+// Define name of person doing flip
 app.intent('FlipIntent',
   {
     "slots":{"FirstName":"AMAZON.Person"}
@@ -74,6 +78,8 @@ app.intent('FlipIntent',
   }
 );
 
+
+// Tells secret message
 app.intent("SecretIntent",
 	{
 		"slots":{},
@@ -92,6 +98,7 @@ app.intent("SecretIntent",
 	}
 )
 
+// Stops skill
 app.intent("AMAZON.StopIntent",
 	{
 		"slots": {},
