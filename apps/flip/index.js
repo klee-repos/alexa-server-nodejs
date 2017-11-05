@@ -46,6 +46,7 @@ app.intent("GetRequestsIntent",
 				console.log(result);
 			}
 		})
+		response.say("I have printed the details in the command line. Who wants to do a flip?").reprompt("Who wants to do a flip?").shouldEndSession(false);
 	}
 )
 
