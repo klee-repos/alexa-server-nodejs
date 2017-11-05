@@ -6,7 +6,7 @@ var app = new alexa.app('flip');
 
 
 app.launch(function(request, response) {
-	response.say("Welcome my friend. Who wants to do a flip?").reprompt("Who wants to do a flip?").shouldEndSession(false);
+	response.say("Who wants to do a flip?").reprompt("Who wants to do a flip?").shouldEndSession(false);
 });
 
 app.error = function(exception, request, response) {
@@ -27,23 +27,24 @@ app.intent('FlipIntent',
   },
   function (request,response) {
     var name = request.slot('FirstName');
-    response.say(name + " wants to do a flip!").shouldEndSession(false);
-    response.say("Would you like to hear a quote?");
+    response.say(name + " wants to do a flip!");
+    response.say("Want to know a secret?").reprompt("Want to know a secret?").shouldEndSession(false);
   }
 );
 
 app.intent("QuoteIntent",
 	{
 		"utterances": [
-			"Tell me a quote",
+			"Tell me a secret",
 			"Yes",
-			"I would love to hear a quote",
-			"Yes, I would like to hear a quote",
-			"Yes, I would like to hear one"
+			"What",
+			"Tell me the secret",
+			"I would love to know the secret",
+			"Yes please"
 		]
 	},
 	function (request, response) {
-		response.say("Gavin looves to do flips!").shouldEndSession(true);
+		response.say("Gavin loves to do flips!").shouldEndSession(true);
 	}
 )
 
