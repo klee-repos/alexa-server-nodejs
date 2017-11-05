@@ -1,6 +1,8 @@
 
 'use strict';
 
+var requestapi = require('request');
+
 // environmental variables
 var dotenv = require('dotenv').config();
 
@@ -93,6 +95,31 @@ app.intent('FlipIntent',
 	    response.say("Want to know a secret?").reprompt("Want to know a secret?").shouldEndSession(false);
 	}
 );
+
+app.intent("GetScoreIntent",
+	{
+		"slots":{},
+		"utterances": [
+			"Get score",
+			"Tell me the score",
+			"What is the score"
+		]
+	},
+	function(request, response) {
+		// requestapi
+		// 	.get('https://alexa-blackjack-gk.herokuapp.com/score')
+		// 	.on('response', function(scoreRes) {
+		// 		console.log(scoreRes);
+		// 		response.say("The score is printed").shouldEndSession(true);
+		// 	});
+		requestapi('https://alexa-blackjack-gk.herokuapp.com/score', function(err, res, body) {
+			var content = JSON.parse(body);
+			console.log(content.score);
+			response.say("the score is " + content.score).shouldEndSession(true);
+		})
+
+	}
+)
 
 app.intent("SearchIntent",
 	{
