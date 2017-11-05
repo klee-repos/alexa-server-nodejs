@@ -105,18 +105,24 @@ app.intent("GetScoreIntent",
 			"What is the score"
 		]
 	},
-	function(request, response) {
+	function(request, alexaSay) {
 		// requestapi
 		// 	.get('https://alexa-blackjack-gk.herokuapp.com/score')
 		// 	.on('response', function(scoreRes) {
 		// 		console.log(scoreRes);
 		// 		response.say("The score is printed").shouldEndSession(true);
 		// 	});
+		var contentScore;
 		requestapi('https://alexa-blackjack-gk.herokuapp.com/score', function(err, res, body) {
 			var content = JSON.parse(body);
 			console.log(content.score);
-			response.say("the score is " + content.score).shouldEndSession(true);
+			contentScore = content.score;
+			console.log(alexaSay);
+			//response.say("the score is 4").shouldEndSession(true);
 		})
+		process.sleep(1000);
+		alexaSay.say("the score is " + contentScore);
+		
 
 	}
 )
