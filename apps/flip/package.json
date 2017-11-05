@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "alexa-app": "^4.2.0"
+    "alexa-app": "^4.2.0",
+    "mongodb": "^2.2.33"
   }
 }
