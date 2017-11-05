@@ -1,13 +1,16 @@
 
 'use strict';
 
+// environmental variables
+var dotenv = require('dotenv').config();
+
 // Alexa App framework
 var alexa = require('alexa-app');
 var app = new alexa.app('flip');
 
 // Connection to MongoDB Atlas
 var MongoClient = require("mongodb").MongoClient;
-var uri = "mongodb://lynkr:aviademy@test-shard-00-00-mlsxy.mongodb.net:27017,test-shard-00-01-mlsxy.mongodb.net:27017,test-shard-00-02-mlsxy.mongodb.net:27017/test?ssl=true&replicaSet=test-shard-0&authSource=admin";
+var uri = process.env.DB_URI;
 var database;
 
 MongoClient.connect(uri, function(err, db) {
@@ -77,7 +80,6 @@ app.intent('FlipIntent',
     response.say("Want to know a secret?").reprompt("Want to know a secret?").shouldEndSession(false);
   }
 );
-
 
 // Tells secret message
 app.intent("SecretIntent",
