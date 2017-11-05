@@ -1,9 +1,10 @@
 
 'use strict';
 
-var requestapi = require('request');
+// Request promise
+var requestPromise = require('request-promise');
 
-// environmental variables
+// Use global environmental variables
 var dotenv = require('dotenv').config();
 
 // Alexa App framework
@@ -16,8 +17,6 @@ var Flip = require("./models/flipSchema");
 var uri = process.env.DB_URI;
 var database;
 
-var requestPromise = require('request-promise');
-
 mongoose.connect(uri, {useMongoClient: true}, function(err) {
 	if (err) {
 		console.log("Mongoose error: " + err);
@@ -28,16 +27,16 @@ mongoose.connect(uri, {useMongoClient: true}, function(err) {
 });
 
 // Launch
-app.launch(function(request, response) {
-	response.say("Who wants to do a flip?").reprompt("Who wants to do a flip?").shouldEndSession(false);
+app.launch(function(alexaReq, alexaRes) {
+	alexaRes.say("Who wants to do a flip?").reprompt("Who wants to do a flip?").shouldEndSession(false);
 });
 
 // Error handling
-app.error = function(exception, request, response) {
+app.error = function(exception, alexaReq, alexaRes) {
 	console.log(exception)
-	console.log(request);
-	console.log(response);	
-	response.say( 'The following error has occurred. ' + error.message);
+	console.log(alexaReq);
+	console.log(alexaRes);	
+	alexaRes.say( 'an error error has occurred.');
 };
 
 // Print all stored requests in command line
@@ -50,7 +49,7 @@ app.intent("GetRequestsIntent",
 			"Request logs"
 		]
 	},
-	function (request, response) {
+	function (alexaReq, alexaRes) {
 		database.collection('alexa-requests').find().toArray(function(err,result) {
 			if (err) {
 				console.log(err);
@@ -58,7 +57,7 @@ app.intent("GetRequestsIntent",
 				console.log(result);
 			}
 		})
-		response.say("I have printed the details in the command line. Who wants to do a flip?").reprompt("Who wants to do a flip?").shouldEndSession(false);
+		alexaRes.say("I have printed the details in the command line. Who wants to do a flip?").reprompt("Who wants to do a flip?").shouldEndSession(false);
 	}
 )
 
@@ -72,15 +71,15 @@ app.intent('FlipIntent',
 			"{FirstName} is gonna do a flip"
 		]
   	},
-  	function (request,response) {
-  		database.collection('alexa-requests').save(request, function(err, result) {
+  	function (alexaReq,alexaRes) {
+  		database.collection('alexa-requests').save(alexaReq, function(err, result) {
 	  		if (err) {
 	  			console.log("There was an error saving request to MongoDB Atlas");
 	  		} else {
 	  			console.log("Request saved to MongoDB Atlas");
 	  		}
 	  	});
-	    var name = request.slot('FirstName');
+	    var name = alexaReq.slot('FirstName');
 	    var myDate = new Date();
 	    var newFlip = Flip({
 	    	name: name,
@@ -93,8 +92,8 @@ app.intent('FlipIntent',
 	    		console.log('Flip recorded to database');
 	    	}
 	    })
-	    response.say(name + " wants to do a flip!");
-	    response.say("Want to know a secret?").reprompt("Want to know a secret?").shouldEndSession(false);
+	    alexaRes.say(name + " wants to do a flip!");
+	    alexaRes.say("Want to know a secret?").reprompt("Want to know a secret?").shouldEndSession(false);
 	}
 );
 
@@ -107,12 +106,12 @@ app.intent("GetScoreIntent",
 			"What is the score"
 		]
 	},
-	function(request, alexaSay) {
+	function(alexaReq, alexaRes) {
 		return requestPromise('https://alexa-blackjack-gk.herokuapp.com/score')
-			.then(function(res){
-				var score = JSON.parse(res)["score"];
-				alexaSay.say("I think the score is " + score);
-			}).catch(function(err){
+			.then(function(result) {
+				var score = JSON.parse(result)["score"];
+				alexaRes.say("Your current score is " + score);
+			}).catch(function(err) {
 				console.log(err);
 			});
 	}
@@ -126,19 +125,18 @@ app.intent("SearchIntent",
 			"Does {SlotName} like flips?"
 		]
 	},
-	function(request, response) {
-		var nameQuery = request.slot('SlotName');
+	function(alexaReq, alexaRes) {
+		var nameQuery = alexaReq.slot('SlotName');
 		Flip.find({name: nameQuery}, function(err, flip) {
 			if (err) {
 				console.log(err);
 			} else {
 				console.log(flip);
-				if (flip[0].name) {
-
-					response.say(nameQuery + " likes to do flips.").shouldEndSession(true);
-					console.log(nameQuery + " likes to do flips.");
+				if (flip.length > 0) {
+					alexaRes.say(flip[0].name + " likes to do flips.").shouldEndSession(true);
+					console.log(flip[0].name + " likes to do flips.");
 				} else {
-					response.say(nameQuery + " does not like to do flips.").shouldEndSession(true);
+					alexaRes.say(nameQuery + " does not like to do flips.").shouldEndSession(true);
 					console.log(nameQuery + " does not like to do flips.");
 				}
 			}
