@@ -8,8 +8,8 @@ var dotenv = require('dotenv').config();
 var alexa = require('alexa-app');
 var app = new alexa.app('flip');
 
-// Connection to MongoDB Atlas
-var MongoClient = require("mongodb").MongoClient;
+// Connection to MongoDB Atlas via mongodb library
+/*var MongoClient = require("mongodb").MongoClient;
 var uri = process.env.DB_URI;
 var database;
 
@@ -20,7 +20,21 @@ MongoClient.connect(uri, function(err, db) {
 		database = db;
 		console.log("Successfully connected to MongoDB Atlas");
 	}
-})
+})*/
+
+// Connection to MongoDB Altas via mongoose
+var mongoose = require("mongoose");
+var uri = process.env.DB_URI;
+var database;
+
+mongoose.connect(uri, {useMongoClient: true}, function(err) {
+	if (err) {
+		console.log("Mongoose error: " + err);
+	} else {
+		database = mongoose.connection;
+		console.log("Successfully connected to MongoDB Atlas via mongoose");
+	}
+});
 
 // Launch
 app.launch(function(request, response) {
