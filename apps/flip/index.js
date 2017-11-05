@@ -32,6 +32,7 @@ app.error = function(exception, request, response) {
 
 app.intent("GetRequestsIntent", 
 	{
+		"slots": {},
 		"utterances": [
 			"Show request logs",
 			"Show me request logs",
@@ -75,6 +76,7 @@ app.intent('FlipIntent',
 
 app.intent("SecretIntent",
 	{
+		"slots":{},
 		"utterances": [
 			"Tell me a secret",
 			"Yes",
@@ -86,6 +88,17 @@ app.intent("SecretIntent",
 	},
 	function (request, response) {
 		response.say("Gavin loves to do flips!").shouldEndSession(true);
+		database.close();
+	}
+)
+
+app.intent("AMAZON.StopIntent",
+	{
+		"slots": {},
+		"utterances": []
+	},
+	function(request, response) {
+		response.say("Goodbye.").shouldEndSession(true);
 		database.close();
 	}
 )
