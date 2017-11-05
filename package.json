@@ -4,8 +4,11 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
+    "alexa-app": "^4.2.0",
     "alexa-app-server": "^3.0.1",
-    "dotenv": "^4.0.0"
+    "dotenv": "^4.0.0",
+    "mongoose": "^4.13.0",
+    "request-promise": "^4.2.2"
   },
   "devDependencies": {},
   "scripts": {
