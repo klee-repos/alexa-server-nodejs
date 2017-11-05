@@ -18,7 +18,7 @@ MongoClient.connect(uri, function(err, db) {
 		console.log("MongoDB error: " + err);
 	} else {
 		database = db;
-		console.log("Sucessfully connected to MongoDB Atlas");
+		console.log("Successfully connected to MongoDB Atlas");
 	}
 })
 
