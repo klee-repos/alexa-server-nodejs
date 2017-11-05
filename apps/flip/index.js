@@ -121,24 +121,31 @@ app.intent("SearchIntent",
 	{
 		"slots":{"SlotName":"AMAZON.Person"},
 		"utterances": [
-			"Does {SlotName} like to do flips?",
-			"Does {SlotName} like flips?"
+			"Does {SlotName} like to do flips",
+			"Does {SlotName} like flips"
 		]
 	},
 	function(alexaReq, alexaRes) {
 		var nameQuery = alexaReq.slot('SlotName');
-		Flip.find({name: nameQuery}, function(err, flip) {
+		var found = false;
+		return Flip.find({name: nameQuery}, function(err, flip) {
 			if (err) {
 				console.log(err);
 			} else {
 				console.log(flip);
 				if (flip.length > 0) {
-					alexaRes.say(flip[0].name + " likes to do flips.").shouldEndSession(true);
+					found = true;
 					console.log(flip[0].name + " likes to do flips.");
 				} else {
-					alexaRes.say(nameQuery + " does not like to do flips.").shouldEndSession(true);
+					found = false;
 					console.log(nameQuery + " does not like to do flips.");
 				}
+			}
+		}).then(function(flip) {
+			if (found) {
+				alexaRes.say(nameQuery + " likes to do flips.");
+			} else {
+				alexaRes.say(nameQuery + " does not like to do flips.");
 			}
 		})
 	}
