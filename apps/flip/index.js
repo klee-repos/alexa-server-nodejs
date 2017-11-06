@@ -68,18 +68,20 @@ app.intent('FlipIntent',
 	}
 );
 
+
 // Get score from web service
 app.intent("GetScoreIntent",
 	{
-		"slots":{},
+		"slots":{"SessionName":"AMAZON.Animal"},
 		"utterances": [
-			"Get score",
-			"Tell me the score",
-			"What is the score"
+			"What is the score of {SessionName}",
+			"Tell me the score of {SessionName}",
+			"What is the score of {SessionName}"
 		]
 	},
 	function(alexaReq, alexaRes) {
-		return requestPromise('https://alexa-blackjack-gk.herokuapp.com/score')
+		var animal = alexaReq.slot('SessionName');
+		return requestPromise('https://c09ca493.ngrok.io/score/' + animal)
 			.then(function(result) {
 				var score = JSON.parse(result)["score"];
 				alexaRes.say("Your current score is " + score);
