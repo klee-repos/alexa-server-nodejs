@@ -91,6 +91,37 @@ app.intent("GetScoreIntent",
 	}
 )
 
+// Get score from web service
+app.intent("SetScoreIntent",
+	{
+		"slots":{"SessionName":"AMAZON.Animal", "ScoreNumber":"AMAZON.Number"},
+		"utterances": [
+			"Set score of {SessionName} to {ScoreNumber}",
+			"Make {SessionName} {ScoreNumber}"
+		]
+	},
+	function(alexaReq, alexaRes) {
+		var animal = alexaReq.slot('SessionName');
+		var score = alexaReq.slot('ScoreNumber');
+
+		var reqOptions = {
+			method: 'POST',
+			uri: 'https://c09ca493.ngrok.io/score/',
+			body : {
+				name: animal,
+				score: score
+			},
+			json: true
+		};
+
+		return requestPromise(reqOptions).then(function(bodyRes) {
+			alexaRes.say("The score of " + animal + " has been updated");
+		}).catch(function(err) {
+			console.log(err);
+		})
+	}
+)
+
 // Search db to see if person likes to do flips
 app.intent("SearchIntent",
 	{
