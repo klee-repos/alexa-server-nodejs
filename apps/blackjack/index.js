@@ -40,6 +40,7 @@ app.launch(function(alexaReq, alexaRes) {
 	return Game.findOne({amzUserId: amzUserId}, function(err, resGame) {
 		if (resGame) {
 			newPlayer = false;
+			session.set('animalSession', resGame.name);
 			console.log("amzUserId found in a game session");
 		} else {
 			newPlayer = true;
@@ -62,7 +63,7 @@ app.error = function(err, alexaReq, alexaRes) {
 	alexaRes.say( 'an error error has occurred: ' + err);
 };
 
-app.intent("GetSessionIntent",
+app.intent("ConnectSessionIntent",
 	{
 		"slots":{"SessionName":"AMAZON.Animal"},
 		"utterances": [
@@ -78,12 +79,13 @@ app.intent("GetSessionIntent",
 		if (alexaReq.hasSession()) {
 			var session = alexaReq.getSession();
 			amzUserId = session.details.userId;
+			session.set('animalSession', animal);
 		} else {
 			console.log("no session");
 		}
 		var reqOptions = {
 			method: 'POST',
-			uri: 'https://express-experiment-kl.herokuapp.com/connect',
+			uri: 'http://localhost:3000/connect',
 			body : {
 				name: animal,
 				amzUserId: amzUserId
@@ -92,8 +94,18 @@ app.intent("GetSessionIntent",
 		};
 		return requestPromise(reqOptions)
 			.then(function(jsonRes) {
-				alexaRes.say("I have connected you to " + animal);
-				console.log("successfully connected to session: " + animal);
+				if (jsonRes.found) {
+					alexaRes
+						.say("I have connected you to " + animal)
+						.reprompt("Please tell me another command")
+						.shouldEndSession(false);
+					console.log("successfully connected to session: " + animal);
+				} else {
+					alexaRes
+						.say("Unable to find session. Can you repeat the session name?")
+						.reprompt("Can you repeat the session name?")
+						.shouldEndSession(false);
+				}
 			}).catch(function(err) {
 				console.log(err);
 				alexaRes
@@ -101,6 +113,36 @@ app.intent("GetSessionIntent",
 					.reprompt("Can you repeat the session name?")
 					.shouldEndSession(false);
 			});
+	}
+)
+
+app.intent('GetSessionIntent',
+	{
+		"slots": {},
+		"utterances":[
+			"What session am I connected to",
+			"Connection status",
+			"What is my connection status",
+			"What animal am I connected to"
+		]
+	},
+	function(alexaReq, alexaRes) {
+		var animalSession;
+		var amzUserId;
+		var sessionName;
+		if (alexaReq.hasSession()) {
+			var session = alexaReq.getSession();
+			amzUserId = session.details.userId;
+			animalSession = session.get('animalSession');
+
+		} else {
+			console.log("no session");
+		}
+		if (animalSession) {
+			alexaRes.say("You are connected to " + animalSession);
+		} else {
+			alexaRes.say("You are not connected to an animal session");
+		}
 	}
 )
 
