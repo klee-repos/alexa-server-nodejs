@@ -83,7 +83,7 @@ app.intent("GetSessionIntent",
 		}
 		var reqOptions = {
 			method: 'POST',
-			uri: 'http://localhost:3000/connect/',
+			uri: 'https://express-experiment-kl.herokuapp.com/',
 			body : {
 				name: animal,
 				amzUserId: amzUserId
