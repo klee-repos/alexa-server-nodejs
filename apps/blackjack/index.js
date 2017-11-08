@@ -11,13 +11,16 @@ var app = new alexa.app('blackjack');
 // Use global environmental variables
 var dotenv = require('dotenv').config();
 
+// Configuration variables
+var client_uri = process.env.CLIENT_URI || "http://localhost:3000/";
+var db_uri = process.env.DB_URI;
+
 // Connection to MongoDB Altas via mongoose
 var mongoose = require("mongoose");
-var uri = process.env.DB_URI;
 var atlasdb;
 var Game = require("./models/game");
 
-mongoose.connect(uri, {useMongoClient: true}, function(err) {
+mongoose.connect(db_uri, {useMongoClient: true}, function(err) {
 	if (err) {
 		console.log("Mongoose error: " + err);
 	} else {
@@ -25,6 +28,8 @@ mongoose.connect(uri, {useMongoClient: true}, function(err) {
 		console.log("Blackjack successfully connected to MongoDB Atlas via mongoose");
 	}
 });
+
+
 
 // Launch
 app.launch(function(alexaReq, alexaRes) {
@@ -85,7 +90,7 @@ app.intent("ConnectSessionIntent",
 		}
 		var reqOptions = {
 			method: 'POST',
-			uri: 'https://express-experiment-kl.herokuapp.com/connect',
+			uri: client_uri + 'connect',
 			body : {
 				name: animal,
 				amzUserId: amzUserId
