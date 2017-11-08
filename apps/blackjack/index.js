@@ -83,7 +83,7 @@ app.intent("GetSessionIntent",
 		}
 		var reqOptions = {
 			method: 'POST',
-			uri: 'https://express-experiment-kl.herokuapp.com/',
+			uri: 'https://express-experiment-kl.herokuapp.com/connect',
 			body : {
 				name: animal,
 				amzUserId: amzUserId
