@@ -60,13 +60,6 @@ app.launch(function(alexaReq, alexaRes) {
 	})
 });
 
-// Error handling
-app.error = function(err, alexaReq, alexaRes) {
-	console.log(err)
-	console.log(alexaReq);
-	console.log(alexaRes);	
-	alexaRes.say( 'an error error has occurred: ' + err);
-};
 
 app.intent("ConnectSessionIntent",
 	{
@@ -128,13 +121,14 @@ app.intent('GetSessionIntent',
 			"What session am I connected to",
 			"Connection status",
 			"What is my connection status",
-			"What animal am I connected to"
+			"What animal am I connected to",
+			"Session status",
+			"What is my session"
 		]
 	},
 	function(alexaReq, alexaRes) {
 		var animalSession;
 		var amzUserId;
-		var sessionName;
 		if (alexaReq.hasSession()) {
 			var session = alexaReq.getSession();
 			amzUserId = session.details.userId;
@@ -144,10 +138,163 @@ app.intent('GetSessionIntent',
 			console.log("no session");
 		}
 		if (animalSession) {
-			alexaRes.say("You are connected to " + animalSession);
+			alexaRes
+				.say("You are connected to " + animalSession)
+				.reprompt("Please tell me a command.")
+				.shouldEndSession(false);
 		} else {
-			alexaRes.say("You are not connected to an animal session");
+			alexaRes
+				.say("You are not connected to an animal session. What session would you like to connect to?")
+				.reprompt("What session would you like to connect to?")
+				.shouldEndSession(false);
 		}
+	}
+)
+
+app.intent('DealIntent',
+	{
+		"slots": {},
+		"utterances": [
+			"Deal",
+			"Deal cards",
+			"Start game"
+		]
+	},
+	function(alexaReq, alexaRes) {
+		var animalSession;
+		var amzUserId;
+		if (alexaReq.hasSession()) {
+			var session = alexaReq.getSession();
+			amzUserId = session.details.userId;
+			animalSession = session.get('animalSession');
+
+		} else {
+			console.log("no session");
+		}
+		var reqOptions = {
+			method: 'GET',
+			uri: client_uri + 'deal/' + animalSession
+		};
+
+		return requestPromise(reqOptions)
+			.then(function(jsonRes) {
+				if (jsonRes) {
+					alexaRes
+						.say("Dealing cards")
+						.reprompt("Please tell me another command")
+						.shouldEndSession(false);
+					console.log(jsonRes);
+				} else {
+					alexaRes
+						.say("Unable to deal cards")
+						.reprompt("Please tell me another command")
+						.shouldEndSession(false);
+				}
+			}).catch(function(err) {
+				console.log(err);
+				alexaRes
+					.say("I am having trouble connecting. Can you repeat the session name?")
+					.reprompt("Can you repeat the session name?")
+					.shouldEndSession(false);
+			});
+	}
+)
+
+app.intent('HitIntent',
+	{
+		"slots": {},
+		"utterances": [
+			"Hit",
+			"Hit me",
+			"Do a hit"
+		]
+	},
+	function(alexaReq, alexaRes) {
+		var animalSession;
+		var amzUserId;
+		if (alexaReq.hasSession()) {
+			var session = alexaReq.getSession();
+			amzUserId = session.details.userId;
+			animalSession = session.get('animalSession');
+
+		} else {
+			console.log("no session");
+		}
+		var reqOptions = {
+			method: 'GET',
+			uri: client_uri + 'hit/' + animalSession
+		};
+
+		return requestPromise(reqOptions)
+			.then(function(jsonRes) {
+				if (jsonRes) {
+					alexaRes
+						.say("Dealing player another card")
+						.reprompt("Please tell me another command")
+						.shouldEndSession(false);
+					console.log(jsonRes);
+				} else {
+					alexaRes
+						.say("Unable to hit")
+						.reprompt("Please tell me another command")
+						.shouldEndSession(false);
+				}
+			}).catch(function(err) {
+				console.log(err);
+				alexaRes
+					.say("I am having trouble connecting. Can you repeat the session name?")
+					.reprompt("Can you repeat the session name?")
+					.shouldEndSession(false);
+			});
+	}
+)
+
+app.intent('StandIntent',
+	{
+		"slots": {},
+		"utterances": [
+			"Stand",
+			"Stay",
+			"Hold"
+		]
+	},
+	function(alexaReq, alexaRes) {
+		var animalSession;
+		var amzUserId;
+		if (alexaReq.hasSession()) {
+			var session = alexaReq.getSession();
+			amzUserId = session.details.userId;
+			animalSession = session.get('animalSession');
+
+		} else {
+			console.log("no session");
+		}
+		var reqOptions = {
+			method: 'GET',
+			uri: client_uri + 'stand/' + animalSession
+		};
+
+		return requestPromise(reqOptions)
+			.then(function(jsonRes) {
+				if (jsonRes) {
+					alexaRes
+						.say("Playing out dealer hand")
+						.reprompt("Please tell me another command")
+						.shouldEndSession(false);
+					console.log(jsonRes);
+				} else {
+					alexaRes
+						.say("Unable to stand")
+						.reprompt("Please tell me another command")
+						.shouldEndSession(false);
+				}
+			}).catch(function(err) {
+				console.log(err);
+				alexaRes
+					.say("I am having trouble connecting. Can you repeat the session name?")
+					.reprompt("Can you repeat the session name?")
+					.shouldEndSession(false);
+			});
 	}
 )
 
@@ -161,6 +308,14 @@ app.intent("AMAZON.StopIntent",
 		response.say("Goodbye.").shouldEndSession(true);
 	}
 )
+
+// Error handling
+app.error = function(err, alexaReq, alexaRes) {
+	console.log(err)
+	console.log(alexaReq);
+	console.log(alexaRes);	
+	alexaRes.say( 'an error error has occurred: ' + err);
+};
 
 module.exports = app;
 
