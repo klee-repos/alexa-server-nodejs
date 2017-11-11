@@ -33,7 +33,7 @@ app.launch(function(alexaReq, alexaRes) {
 	return Session.findOne({amzUserId: amzUserId}, function(err, resSession) {
 		if (resSession) {
 			newPlayer = false;
-			sessionCode = resSession.name;
+			sessionCode = resSession.sessionCode;
 			session.set('sessionCode', resSession.name);
 		} else {
 			newPlayer = true;
@@ -63,7 +63,7 @@ app.intent("ConnectSessionIntent",
 		var amzUserId;
 		if (alexaReq.hasSession()) {
 			var session = alexaReq.getSession();
-			amzUserId = session.details.userId;
+			amzUserId = session.details.userId; 
 			session.set('sessionCode', sessionCode);
 		}
 
@@ -79,7 +79,12 @@ app.intent("ConnectSessionIntent",
 		return requestPromise(reqOptions)
 			.then(function(jsonRes) {
 				if (jsonRes.found) {
-					Session.findOneAndUpdate({amzUserId: amzUserId}, {$set:{sessionCode:sessionCode}}, {upsert:true});
+					Session.findOneAndUpdate({amzUserId: amzUserId}, {$set:{sessionCode:sessionCode}}, {upsert:true}).then(function(res){
+						console.log(res);
+					},
+						function(err){
+							console.log(err);
+						});
 
 					alexaRes
 						.say("I have connected you to " + sessionCode)
