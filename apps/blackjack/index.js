@@ -18,7 +18,7 @@ var db_uri = process.env.DB_URI;
 // Connection to MongoDB Altas via mongoose
 var mongoose = require("mongoose");
 var atlasdb;
-var Game = require("./models/game");
+var Session = require("./models/Session");
 
 mongoose.connect(db_uri, {useMongoClient: true}, function(err) {
 	if (err) {
@@ -35,6 +35,7 @@ mongoose.connect(db_uri, {useMongoClient: true}, function(err) {
 app.launch(function(alexaReq, alexaRes) {
 	var amzUserId;
 	var newPlayer = true;
+	var animalSession;
 	
 	if (alexaReq.hasSession()) {
 		var session = alexaReq.getSession();
@@ -42,20 +43,21 @@ app.launch(function(alexaReq, alexaRes) {
 	} else {
 		console.log("no session");
 	}
-	return Game.findOne({amzUserId: amzUserId}, function(err, resGame) {
-		if (resGame) {
+	return Session.findOne({amzUserId: amzUserId}, function(err, resSession) {
+		if (resSession) {
 			newPlayer = false;
-			session.set('animalSession', resGame.name);
-			console.log("amzUserId found in a game session");
+			animalSession = resSession.name;
+			session.set('animalSession', resSession.name);
+			console.log("amzUserId found in a Session session");
 		} else {
 			newPlayer = true;
-			console.log("amzUserId not found in a game session");
+			console.log("amzUserId not found in a Session session");
 		}
 	}).then(function(findRes) {
 		if (newPlayer) {
 			alexaRes.say("Welcome to Blackjack. What session would you like to connect to?").reprompt("What session would you like to connect to?").shouldEndSession(false);
 		} else {
-			alexaRes.say("Welcome to Blackjack. Connected successfully").reprompt("Please tell me a command").shouldEndSession(false);
+			alexaRes.say("Welcome to Blackjack. Connected successfully to session " + animalSession).reprompt("Please tell me a command").shouldEndSession(false);
 		}
 	})
 });
@@ -85,7 +87,7 @@ app.intent("ConnectSessionIntent",
 			method: 'POST',
 			uri: client_uri + 'connect',
 			body : {
-				name: animal,
+				sessionCode: animal,
 				amzUserId: amzUserId
 			},
 			json: true
@@ -95,7 +97,7 @@ app.intent("ConnectSessionIntent",
 				if (jsonRes.found) {
 					alexaRes
 						.say("I have connected you to " + animal)
-						.reprompt("Please tell me another command")
+						.reprompt("Ready to play blackjack")
 						.shouldEndSession(false);
 					console.log("successfully connected to session: " + animal);
 				} else {
@@ -140,7 +142,7 @@ app.intent('GetSessionIntent',
 		if (animalSession) {
 			alexaRes
 				.say("You are connected to " + animalSession)
-				.reprompt("Please tell me a command.")
+				.reprompt("Ready to play blackjack.")
 				.shouldEndSession(false);
 		} else {
 			alexaRes
@@ -157,7 +159,7 @@ app.intent('DealIntent',
 		"utterances": [
 			"Deal",
 			"Deal cards",
-			"Start game"
+			"Start Session"
 		]
 	},
 	function(alexaReq, alexaRes) {
