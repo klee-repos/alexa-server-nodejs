@@ -154,19 +154,18 @@ app.intent('DealIntent',
 		]
 	},
 	function(alexaReq, alexaRes) {
-		var animalSession;
+		var sessionCode;
 		var amzUserId;
 		if (alexaReq.hasSession()) {
 			var session = alexaReq.getSession();
 			amzUserId = session.details.userId;
-			animalSession = session.get('animalSession');
-
+			sessionCode = session.get('sessionCode');			
 		} else {
 			console.log("no session");
 		}
 		var reqOptions = {
 			method: 'GET',
-			uri: client_uri + 'deal/' + animalSession
+			uri: client_uri + 'deal/' + sessionCode
 		};
 
 		return requestPromise(reqOptions)
@@ -176,7 +175,6 @@ app.intent('DealIntent',
 						.say("Dealing cards")
 						.reprompt("Please tell me another command")
 						.shouldEndSession(false);
-					console.log(jsonRes);
 				} else {
 					alexaRes
 						.say("Unable to deal cards")
@@ -203,19 +201,19 @@ app.intent('HitIntent',
 		]
 	},
 	function(alexaReq, alexaRes) {
-		var animalSession;
+		var sessionCode;
 		var amzUserId;
 		if (alexaReq.hasSession()) {
 			var session = alexaReq.getSession();
 			amzUserId = session.details.userId;
-			animalSession = session.get('animalSession');
+			sessionCode = session.get('sessionCode');
 
 		} else {
 			console.log("no session");
 		}
 		var reqOptions = {
 			method: 'GET',
-			uri: client_uri + 'hit/' + animalSession
+			uri: client_uri + 'hit/' + sessionCode
 		};
 
 		return requestPromise(reqOptions)
@@ -225,7 +223,6 @@ app.intent('HitIntent',
 						.say("Dealing player another card")
 						.reprompt("Please tell me another command")
 						.shouldEndSession(false);
-					console.log(jsonRes);
 				} else {
 					alexaRes
 						.say("Unable to hit")
@@ -252,19 +249,19 @@ app.intent('StandIntent',
 		]
 	},
 	function(alexaReq, alexaRes) {
-		var animalSession;
+		var sessionCode;
 		var amzUserId;
 		if (alexaReq.hasSession()) {
 			var session = alexaReq.getSession();
 			amzUserId = session.details.userId;
-			animalSession = session.get('animalSession');
+			sessionCode = session.get('sessionCode');
 
 		} else {
 			console.log("no session");
 		}
 		var reqOptions = {
 			method: 'GET',
-			uri: client_uri + 'stand/' + animalSession
+			uri: client_uri + 'stand/' + sessionCode
 		};
 
 		return requestPromise(reqOptions)
@@ -274,7 +271,6 @@ app.intent('StandIntent',
 						.say("Playing out dealer hand")
 						.reprompt("Please tell me another command")
 						.shouldEndSession(false);
-					console.log(jsonRes);
 				} else {
 					alexaRes
 						.say("Unable to stand")
