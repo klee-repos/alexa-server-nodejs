@@ -50,7 +50,7 @@ app.launch(function(alexaReq, alexaRes) {
 
 app.intent("ConnectSessionIntent",
 	{
-		"slots":{"SessionName":"AMAZON.AMAZON.FOUR_DIGIT_NUMBER"},
+		"slots":{"SessionName":"AMAZON.FOUR_DIGIT_NUMBER"},
 		"utterances": [
 			"Connect to {SessionName}",
 			"Connect me to {SessionName}",
