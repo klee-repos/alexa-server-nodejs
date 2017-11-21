@@ -42,7 +42,7 @@ app.launch(function(alexaReq, alexaRes) {
 		if (newPlayer) {
 
 			alexaRes
-			.say("<speak>Welcome to Dash. <break time='2s'/> What session would you like to connect to?</speak>")
+			.say("<speak>Welcome to Dash. <break time='1s'/> What session would you like to connect to?</speak>")
 			.reprompt("Please say the four digit session number you'd like to connect to.")
 			.shouldEndSession(false);
 		} else {
@@ -84,22 +84,15 @@ app.intent("ConnectSessionIntent",
 			.then(function(jsonRes) {
 				if (jsonRes.status === 'created') {
 					alexaRes
-					.say("Sucessfully linked Amazon account to session number. Commands are highlighted in red.")
+					.say("<speak>Sucessfully linked Amazon account to session number " + "<say-as interpret-as='digits'>" + sessionCode + "</say-as>. <break time='1s'/>Commands are highlighted in red.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 				} 
-				
 				if (jsonRes.status === 'existing') {
 					alexaRes
-					.say("Session code is already linked with another Amazon account. Please choose another.")
+					.say("<speak>Session code is already linked with another Amazon account. <break time='1s'> Please choose another.</speak>")
 					.reprompt("Please say the session number.")
 					.shouldEndSession(false);
-				}
-				if (!jsonRes.status) {
-					alexaRes
-						.say("Unable to find session. Can you repeat the session name?")
-						.reprompt("Can you repeat the session name?")
-						.shouldEndSession(false);
 				}
 			}).catch(function(err) {
 				console.log(err);
@@ -135,7 +128,7 @@ app.intent('GetSessionIntent',
 		}
 		if (sessionCode) {
 			alexaRes
-				.say("You are connected to " + sessionCode + "." + "Commands are highlighted in red.")
+				.say("<speak>You are connected to " + "<say-as interpet-as='digits'>" + sessionCode + "</say-as>. <break time='1s'>" + "Commands are highlighted in red.</speak>")
 				.reprompt("Commands are highlighted in red.")
 				.shouldEndSession(false);
 		} else {
@@ -176,7 +169,7 @@ app.intent('OpenTwentyOneIntent',
 			.then(function(jsonRes) {
 				if (jsonRes.status === 'started') {
 					alexaRes
-					.say("Twenty One opened.")
+					.say("Opened.")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 				} else {
@@ -188,7 +181,7 @@ app.intent('OpenTwentyOneIntent',
 			}).catch(function(err) {
 				console.log(err);
 				alexaRes
-					.say("I am having trouble. Can you repeat your command?")
+					.say("I am having trouble. <break time='1s'> Can you repeat your command?")
 					.reprompt("Can you repeat your command?")
 					.shouldEndSession(false);
 			});
@@ -224,7 +217,7 @@ function(alexaReq, alexaRes) {
 		.then(function(jsonRes) {
 			if (jsonRes.status === 'stopped') {
 				alexaRes
-				.say("Twenty One closed.")
+				.say("Closed.")
 				.reprompt("Commands are highlighted in red.")
 				.shouldEndSession(false);
 			} else {
