@@ -22,7 +22,6 @@ mongoose.connect(uri, {useMongoClient: true}, function(err) {
 		console.log("Mongoose error: " + err);
 	} else {
 		atlasdb = mongoose.connection;
-		console.log("Flip successfully connected to MongoDB Atlas via mongoose");
 	}
 });
 
