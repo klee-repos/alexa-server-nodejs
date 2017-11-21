@@ -40,9 +40,13 @@ app.launch(function(alexaReq, alexaRes) {
 		}
 	}).then(function() {
 		if (newPlayer) {
-			alexaRes.say("Welcome to Dash. What session would you like to connect to?").reprompt("What session would you like to connect to?").shouldEndSession(false);
+
+			alexaRes
+			.say("<speak>Welcome to Dash. <break time='2s'/> What session would you like to connect to?</speak>")
+			.reprompt("Please say the four digit session number you'd like to connect to.")
+			.shouldEndSession(false);
 		} else {
-			alexaRes.say("Welcome to Dash. Connected to session " + sessionCode + ". " + "Commands are highlighted in red.").reprompt("Commands are highlighted in red.").shouldEndSession(false);
+			alexaRes.say("Connected to Dash").reprompt("Commands are in red.").shouldEndSession(false);
 		}
 	})
 });
