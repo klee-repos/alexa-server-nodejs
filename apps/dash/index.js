@@ -42,7 +42,7 @@ app.launch(function(alexaReq, alexaRes) {
 		if (newPlayer) {
 
 			alexaRes
-			.say("<speak>Welcome to Dash. <break time='1s'/> What session would you like to connect to?</speak>")
+			.say("<speak>Welcome to Dash. <break time='0.5s'/> What session would you like to connect to?</speak>")
 			.reprompt("Please say the four digit session number you'd like to connect to.")
 			.shouldEndSession(false);
 		} else {
@@ -84,7 +84,7 @@ app.intent("ConnectSessionIntent",
 			.then(function(jsonRes) {
 				if (jsonRes.status === 'created') {
 					alexaRes
-					.say("<speak>Sucessfully linked Amazon account to session number " + "<say-as interpret-as='digits'>" + sessionCode + "</say-as>. <break time='1s'/>Commands are highlighted in red.</speak>")
+					.say("<speak>Sucessfully linked Amazon account to session number " + "<say-as interpret-as='digits'>" + sessionCode + "</say-as>. <break time='1s'/>Please say a command highlighted in red.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 				} 
@@ -128,7 +128,7 @@ app.intent('GetSessionIntent',
 		}
 		if (sessionCode) {
 			alexaRes
-				.say("<speak>You are connected to " + "<say-as interpet-as='digits'>" + sessionCode + "</say-as>. <break time='1s'>" + "Commands are highlighted in red.</speak>")
+				.say("<speak>You are connected to " + "<say-as interpet-as='digits'>" + sessionCode + "</say-as>. <break time='1s'>" + "Please say a Command highlighted in red.</speak>")
 				.reprompt("Commands are highlighted in red.")
 				.shouldEndSession(false);
 		} else {
@@ -145,7 +145,6 @@ app.intent('OpenTwentyOneIntent',
 		"slots": {},
 		"utterances":[
 			"Open Twenty One",
-			"Open 21",
 			"Open blackjack",
 			"Open black jack"
 		]
@@ -193,7 +192,6 @@ app.intent('CloseTwentyOneIntent',
 	"slots": {},
 	"utterances":[
 		"Close Twenty One",
-		"Close 21",
 		"Close blackjack",
 		"Close black jack"
 	]
@@ -264,14 +262,39 @@ function(alexaReq, alexaRes) {
 	return requestPromise(reqOptions)
 		.then(function(jsonRes) {
 			console.log(jsonRes)
-			if (jsonRes.result) {
+			if (jsonRes.result === 'Dealer wins - Blackjack') {
 				alexaRes
-					.say("Game over.")
+					.say("<speak>Blackjack. <break time='0.5s'> Dealer wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
-			} else {
+			} 
+			if (jsonRes.result === 'Player wins - Blackjack') {
 				alexaRes
-					.say("Cards dealt.")
+					.say("<speak>Blackjack. <break time='0.5s'> Player wins.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			}
+			if (jsonRes.result === 'Player lose - Bust') {
+				alexaRes
+					.say("<speak>Bust. <break time='0.5s'> Dealer wins.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			}
+			if (jsonRes.result === 'Player wins - dealer bust') {
+				alexaRes
+					.say("<speak>Bust. <break time='0.5s'> Player wins.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			}
+			if (jsonRes.result === 'Push') {
+				alexaRes
+					.say("<speak>Push. <break time='0.5s'> Game is a draw.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			}
+			if (jsonRes.result === null) {
+				alexaRes
+					.say("<speak><prosody rate='fast'>Good luck.</prosody></speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
@@ -310,14 +333,39 @@ function(alexaReq, alexaRes) {
 	return requestPromise(reqOptions)
 		.then(function(jsonRes) {
 			console.log(jsonRes)
-			if (jsonRes.result) {
+			if (jsonRes.result === 'Dealer wins - Blackjack') {
 				alexaRes
-				.say("Game over.")
-				.reprompt("Commands are highlighted in red.")
-				.shouldEndSession(false);
-			} else {
+					.say("<speak>Blackjack. <break time='0.5s'> Dealer wins.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			} 
+			if (jsonRes.result === 'Player wins - Blackjack') {
 				alexaRes
-					.say("Hit.")
+					.say("<speak>Blackjack. <break time='0.5s'> Player wins.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			}
+			if (jsonRes.result === 'Player lose - Bust') {
+				alexaRes
+					.say("<speak>Bust. <break time='0.5s'> Dealer wins.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			}
+			if (jsonRes.result === 'Player wins - dealer bust') {
+				alexaRes
+					.say("<speak>Bust. <break time='0.5s'> Player wins.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			}
+			if (jsonRes.result === 'Push') {
+				alexaRes
+					.say("<speak>Push. <break time='0.5s'> Game is a draw.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			}
+			if (jsonRes.result === null) {
+				alexaRes
+					.say(".")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
@@ -357,14 +405,33 @@ function(alexaReq, alexaRes) {
 	return requestPromise(reqOptions)
 		.then(function(jsonRes) {
 			console.log(jsonRes)
-			if (jsonRes.result) {
+			if (jsonRes.result === 'Dealer wins - Blackjack') {
 				alexaRes
-				.say("Game over.")
-				.reprompt("Commands are highlighted in red.")
-				.shouldEndSession(false);
-			} else {
+					.say("<speak>Blackjack. <break time='0.5s'> Dealer wins.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			} 
+			if (jsonRes.result === 'Player wins - Blackjack') {
 				alexaRes
-					.say("Hit.")
+					.say("<speak>Blackjack. <break time='0.5s'> Player wins.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			}
+			if (jsonRes.result === 'Player wins - closer to 21') {
+				alexaRes
+					.say("<speak>Player is closer to 21. <break time='0.5s'> Player wins.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			}
+			if (jsonRes.result === 'Dealer wins - closer to 21') {
+				alexaRes
+					.say("<speak>Dealer is closer to 21. <break time='0.5s'> Dealer wins.</speak>")
+					.reprompt("Commands are highlighted in red.")
+					.shouldEndSession(false);
+			}
+			if (jsonRes.result === 'Push') {
+				alexaRes
+					.say("<speak>Push. <break time='0.5s'> Game is a draw.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
