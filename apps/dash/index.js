@@ -42,7 +42,7 @@ app.launch(function(alexaReq, alexaRes) {
 		if (newPlayer) {
 
 			alexaRes
-			.say("<speak>Welcome to Dash. <break time='0.5s'/> What session would you like to connect to?</speak>")
+			.say("<speak>Welcome to Dash. <break time='1s'/> What session would you like to connect to?</speak>")
 			.reprompt("Please say the four digit session number you'd like to connect to.")
 			.shouldEndSession(false);
 		} else {
@@ -264,31 +264,31 @@ function(alexaReq, alexaRes) {
 			console.log(jsonRes)
 			if (jsonRes.result === 'Dealer wins - Blackjack') {
 				alexaRes
-					.say("<speak>Blackjack. <break time='0.5s'> Dealer wins.</speak>")
+					.say("<speak>Blackjack. <break time='1s'> Dealer wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			} 
 			if (jsonRes.result === 'Player wins - Blackjack') {
 				alexaRes
-					.say("<speak>Blackjack. <break time='0.5s'> Player wins.</speak>")
+					.say("<speak>Blackjack. <break time='1s'> Player wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
 			if (jsonRes.result === 'Player lose - Bust') {
 				alexaRes
-					.say("<speak>Bust. <break time='0.5s'> Dealer wins.</speak>")
+					.say("<speak>Bust. <break time='1s'> Dealer wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
 			if (jsonRes.result === 'Player wins - dealer bust') {
 				alexaRes
-					.say("<speak>Bust. <break time='0.5s'> Player wins.</speak>")
+					.say("<speak>Bust. <break time='1s'> Player wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
 			if (jsonRes.result === 'Push') {
 				alexaRes
-					.say("<speak>Push. <break time='0.5s'> Game is a draw.</speak>")
+					.say("<speak>Push. <break time='1s'> Game is a draw.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
@@ -335,31 +335,31 @@ function(alexaReq, alexaRes) {
 			console.log(jsonRes)
 			if (jsonRes.result === 'Dealer wins - Blackjack') {
 				alexaRes
-					.say("<speak>Blackjack. <break time='0.5s'> Dealer wins.</speak>")
+					.say("<speak>Blackjack. <break time='1s'> Dealer wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			} 
 			if (jsonRes.result === 'Player wins - Blackjack') {
 				alexaRes
-					.say("<speak>Blackjack. <break time='0.5s'> Player wins.</speak>")
+					.say("<speak>Blackjack. <break time='1s'> Player wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
 			if (jsonRes.result === 'Player lose - Bust') {
 				alexaRes
-					.say("<speak>Bust. <break time='0.5s'> Dealer wins.</speak>")
+					.say("<speak>Bust. <break time='1s'> Dealer wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
 			if (jsonRes.result === 'Player wins - dealer bust') {
 				alexaRes
-					.say("<speak>Bust. <break time='0.5s'> Player wins.</speak>")
+					.say("<speak>Bust. <break time='1s'> Player wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
 			if (jsonRes.result === 'Push') {
 				alexaRes
-					.say("<speak>Push. <break time='0.5s'> Game is a draw.</speak>")
+					.say("<speak>Push. <break time='1s'> Game is a draw.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
@@ -407,31 +407,31 @@ function(alexaReq, alexaRes) {
 			console.log(jsonRes)
 			if (jsonRes.result === 'Dealer wins - Blackjack') {
 				alexaRes
-					.say("<speak>Blackjack. <break time='0.5s'> Dealer wins.</speak>")
+					.say("<speak>Blackjack. <break time='1s'> Dealer wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			} 
 			if (jsonRes.result === 'Player wins - Blackjack') {
 				alexaRes
-					.say("<speak>Blackjack. <break time='0.5s'> Player wins.</speak>")
+					.say("<speak>Blackjack. <break time='1s'> Player wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
 			if (jsonRes.result === 'Player wins - closer to 21') {
 				alexaRes
-					.say("<speak>Player is closer to 21. <break time='0.5s'> Player wins.</speak>")
+					.say("<speak>Player is closer to 21. <break time='1s'> Player wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
 			if (jsonRes.result === 'Dealer wins - closer to 21') {
 				alexaRes
-					.say("<speak>Dealer is closer to 21. <break time='0.5s'> Dealer wins.</speak>")
+					.say("<speak>Dealer is closer to 21. <break time='1s'> Dealer wins.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
 			if (jsonRes.result === 'Push') {
 				alexaRes
-					.say("<speak>Push. <break time='0.5s'> Game is a draw.</speak>")
+					.say("<speak>Push. <break time='1s'> Game is a draw.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 			}
