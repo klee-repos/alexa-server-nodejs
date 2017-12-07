@@ -63,6 +63,7 @@ app.intent("ConnectSessionIntent",
 	function(alexaReq, alexaRes) {
 		var connectCode = alexaReq.slot('connectCode');
 		var amzUserId;
+
 		if (alexaReq.hasSession()) {
 			var session = alexaReq.getSession();
 			amzUserId = session.details.userId; 
@@ -112,24 +113,31 @@ app.intent('GetSessionIntent',
 		]
 	},
 	function(alexaReq, alexaRes) {
-		var animalSession, amzUserId, sessionCode;
+		var amzUserId, sessionCode;
 		if (alexaReq.hasSession()) {
 			var session = alexaReq.getSession();
 			amzUserId = session.details.userId;
-			sessionCode = session.get('sessionCode');
-
 		} else {
 			console.log("no session");
 		}
-		if (sessionCode) {
-			alexaRes
-				.say("<speak>You are connected to " + sessionCode + "." + "Please say a Command highlighted in red.</speak>")
-				.shouldEndSession(true);
-		} else {
-			alexaRes
-				.say("You are not connected to a session.")
-				.shouldEndSession(true);
-		}
+		return Session.findOne({amzUserId: amzUserId}, function(err, resSession) {
+			if (resSession) {
+				session.set('sessionCode', resSession.sessionCode);
+				sessionCode = session.get('sessionCode');
+			} else {
+				console.log('no session found')
+			}
+		}).then(function() {
+			if (sessionCode) {
+				alexaRes
+					.say("You are connected to " + sessionCode + ".")
+					.shouldEndSession(true);
+			} else {
+				alexaRes
+					.say("You are not connected to a session.")
+					.shouldEndSession(true);
+			}
+		})
 	}
 )
 
