@@ -26,7 +26,7 @@ app.launch(function(alexaReq, alexaRes) {
 	var newPlayer = true;
 	
 	if (alexaReq.hasSession()) {
-		session = alexaReq.getSession();
+		var session = alexaReq.getSession();
 		amzUserId = session.details.userId;
 	} 
 
@@ -42,11 +42,11 @@ app.launch(function(alexaReq, alexaRes) {
 		if (newPlayer) {
 
 			alexaRes
-			.say("<speak>Welcome to Dash. <break time='1s'/> What session would you like to connect to?</speak>")
+			.say("<speak>Welcome to Dash.</speak>")
 			.reprompt("Please say the four digit session number you'd like to connect to.")
 			.shouldEndSession(false);
 		} else {
-			alexaRes.say("Connected to Dash").reprompt("Commands are in red.").shouldEndSession(false);
+			alexaRes.say("Connected to Dash").reprompt("gavin loves flips").shouldEndSession(false);
 		}
 	})
 });
@@ -54,41 +54,42 @@ app.launch(function(alexaReq, alexaRes) {
 
 app.intent("ConnectSessionIntent",
 	{
-		"slots":{"SessionCode":"AMAZON.FOUR_DIGIT_NUMBER"},
+		"slots":{"connectCode":"AMAZON.FOUR_DIGIT_NUMBER"},
 		"utterances": [
-			"Connect to {SessionCode}",
-			"Connect me to {SessionCode}",
-			"{SessionCode}",
-			"I would like to connect to {SessionCode}"
+			"Connect to {connectCode}",
+			"Connect me to {connectCode}",
+			"{connectCode}",
+			"I would like to connect to {connectCode}"
 		]
 	},
 	function(alexaReq, alexaRes) {
-		var sessionCode = alexaReq.slot('SessionCode');
+		var connectCode = alexaReq.slot('connectCode');
 		var amzUserId;
 		if (alexaReq.hasSession()) {
 			var session = alexaReq.getSession();
 			amzUserId = session.details.userId; 
-			session.set('sessionCode', sessionCode);
 		}
 
 		var reqOptions = {
 			method: 'POST',
 			uri: client_uri + 'connect',
 			body : {
-				sessionCode: sessionCode,
+				connectCode: connectCode,
 				amzUserId: amzUserId
 			},
 			json: true
 		};
 		return requestPromise(reqOptions)
 			.then(function(jsonRes) {
-				if (jsonRes.status === 'created') {
+				console.log(jsonRes)
+				if (jsonRes) {
+					session.set('sessionCode', jsonRes);
 					alexaRes
-					.say("<speak>Sucessfully linked Amazon account to session number <say-as interpret-as='digits'>" + sessionCode + "</say-as>. <break time='1s'/>Please say a command highlighted in red.</speak>")
+					.say("<speak>Sucessfully linked Amazon account to session number<break time='1s'/>Please say a command highlighted in red.</speak>")
 					.reprompt("Commands are highlighted in red.")
 					.shouldEndSession(false);
 				} 
-				if (jsonRes.status === 'existing') {
+				if (!jsonRes) {
 					alexaRes
 					.say("<speak>Session code is already linked with another Amazon account. <break time='1s'> Please choose another.</speak>")
 					.reprompt("Please say the session number.")
