@@ -56,10 +56,8 @@ app.intent("ConnectSessionIntent",
 	{
 		"slots":{"connectCode":"AMAZON.FOUR_DIGIT_NUMBER"},
 		"utterances": [
-			"Connect to {connectCode}",
-			"Connect me to {connectCode}",
-			"{connectCode}",
-			"I would like to connect to {connectCode}"
+			"to launch {connectCode}",
+			"launch code {connectCode}"
 		]
 	},
 	function(alexaReq, alexaRes) {
@@ -81,26 +79,22 @@ app.intent("ConnectSessionIntent",
 		};
 		return requestPromise(reqOptions)
 			.then(function(jsonRes) {
-				console.log(jsonRes)
 				if (jsonRes) {
 					session.set('sessionCode', jsonRes);
 					alexaRes
-					.say("<speak>Sucessfully linked Amazon account to session number<break time='1s'/>Please say a command highlighted in red.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
+					.say("Sucessfully launched")
+					.shouldEndSession(true);
 				} 
 				if (!jsonRes) {
 					alexaRes
-					.say("<speak>Session code is already linked with another Amazon account. <break time='1s'> Please choose another.</speak>")
-					.reprompt("Please say the session number.")
-					.shouldEndSession(false);
+					.say("This code is already linked with another Amazon account.")
+					.shouldEndSession(true);
 				}
 			}).catch(function(err) {
 				console.log(err);
 				alexaRes
-					.say("I am having trouble connecting. Can you repeat the session name?")
-					.reprompt("Can you repeat the session name?")
-					.shouldEndSession(false);
+					.say("I am having trouble connecting.")
+					.shouldEndSession(true);
 			});
 	}
 )
@@ -129,14 +123,12 @@ app.intent('GetSessionIntent',
 		}
 		if (sessionCode) {
 			alexaRes
-				.say("<speak>You are connected to " + "<say-as interpet-as='digits'>" + sessionCode + "</say-as>. <break time='1s' />" + "Please say a Command highlighted in red.</speak>")
-				.reprompt("Commands are highlighted in red.")
-				.shouldEndSession(false);
+				.say("<speak>You are connected to " + sessionCode + "." + "Please say a Command highlighted in red.</speak>")
+				.shouldEndSession(true);
 		} else {
 			alexaRes
-				.say("You are not connected to a session. What session would you like to connect to?")
-				.reprompt("What session would you like to connect to?")
-				.shouldEndSession(false);
+				.say("You are not connected to a session.")
+				.shouldEndSession(true);
 		}
 	}
 )
