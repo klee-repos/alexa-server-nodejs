@@ -17,7 +17,7 @@ var ShowApp = function(alexaReq, alexaRes) {
             sessionCode = resSession.sessionCode;
         }
     }).then(function() {
-        var endpoint;
+        var endpoint = '';
         console.log(app);
         if (app === 'weather') {
             endpoint = 'apps/weather/open/';
@@ -42,10 +42,9 @@ var ShowApp = function(alexaReq, alexaRes) {
                     .say("")
                     .shouldEndSession(true);
             }).catch(function(err) {
-                console.log(err);
                 alexaRes
-                    .say("Dash is having trouble opening app.")
-                    .shouldEndSession(true);
+                    .say("Dash is having trouble opening" + app)
+                    .shouldEndSession(true)
             });
     })
 }
