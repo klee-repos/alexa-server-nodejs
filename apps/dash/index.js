@@ -22,7 +22,7 @@ mongoose.connect(db_uri, {useMongoClient: true}, function(err) {
 
 // Launch
 app.launch(function(alexaReq, alexaRes) {
-	var amzUserId, session, sessionCode;
+	var amzUserId, session;
 	var newPlayer = true;
 	
 	if (alexaReq.hasSession()) {
@@ -33,20 +33,19 @@ app.launch(function(alexaReq, alexaRes) {
 	return User.findOne({amzUserId: amzUserId}, function(err, resSession) {
 		if (resSession) {
 			newPlayer = false;
-			sessionCode = resSession.sessionCode;
 			session.set('sessionCode', resSession.sessionCode);
 		} else {
 			newPlayer = true;
 		}
 	}).then(function() {
 		if (newPlayer) {
-
 			alexaRes
-			.say("<speak>Welcome to Dash.</speak>")
-			.reprompt("Please say the four digit session number you'd like to connect to.")
-			.shouldEndSession(false);
+				.say("Welcome to Dash. Please tell Dash the 4 digit number on your screen.")
+				.shouldEndSession(true);
 		} else {
-			alexaRes.say("Connected to Dash").reprompt("gavin loves flips").shouldEndSession(false);
+			alexaRes
+				.say("Connected to Dash. Please tell Dash a command.")
+				.shouldEndSession(true);
 		}
 	})
 });
@@ -83,18 +82,18 @@ app.intent("ConnectSessionIntent",
 				if (jsonRes) {
 					session.set('sessionCode', jsonRes);
 					alexaRes
-					.say("Sucessfully launched")
-					.shouldEndSession(true);
+						.say("")
+						.shouldEndSession(true);
 				} 
 				if (!jsonRes) {
 					alexaRes
-					.say("This code is already linked with another Amazon account.")
-					.shouldEndSession(true);
+						.say("Dash has already linked this code to another amazon account.")
+						.shouldEndSession(true);
 				}
 			}).catch(function(err) {
 				console.log(err);
 				alexaRes
-					.say("I am having trouble connecting.")
+					.say("Dash is having trouble connecting.")
 					.shouldEndSession(true);
 			});
 	}
@@ -118,23 +117,19 @@ app.intent('GetSessionIntent',
 		if (alexaReq.hasSession()) {
 			session = alexaReq.getSession();
 			amzUserId = session.details.userId;
-		} else {
-			console.log("no session");
 		}
 		return User.findOne({amzUserId: amzUserId}, function(err, resSession) {
 			if (resSession) {
 				session.set('sessionCode', resSession.sessionCode);
-			} else {
-				console.log('no session found')
 			}
 		}).then(function() {
 			if (session.get('sessionCode') !== null) {
 				alexaRes
-					.say("You are connected to a session.")
+					.say("")
 					.shouldEndSession(true);
 			} else {
 				alexaRes
-					.say("You are not connected to a session.")
+					.say("You are not connected to a Dash session.")
 					.shouldEndSession(true);
 			}
 		})
@@ -157,16 +152,11 @@ app.intent('SetCityIntent',
 		if (alexaReq.hasSession()) {
 			session = alexaReq.getSession();
 			amzUserId = session.details.userId;
-		} else {
-			console.log("no session");
 		}
-
 		return User.findOne({amzUserId: amzUserId}, function(err, resSession) {
 			if (resSession) {
 				session.set('sessionCode', resSession.sessionCode);
 				sessionCode = resSession.sessionCode;
-			} else {
-				console.log('no session found')
 			}
 		}).then(function() {
 			var reqOptions = {
@@ -179,29 +169,77 @@ app.intent('SetCityIntent',
 					location: location,
 				},
 				json: true
-			};
+			}
 			return requestPromise(reqOptions)
 				.then(function(jsonRes) {
 					if (jsonRes !== null) {
-						console.log(jsonRes)
 						alexaRes
-							.say("Location configured.")
+							.say("")
 							.shouldEndSession(true);
 					} else {
 						alexaRes
-							.say("Unable to configure location.")
+							.say("Dash was unable to configure location.")
 							.shouldEndSession(true);
 					}
 				}).catch(function(err) {
 					console.log(err);
 					alexaRes
-						.say("I am having trouble configuring location;")
+						.say("Dash is having trouble configuring location;")
 						.shouldEndSession(true);
 				});
 		})
 	}
 )
 
+// Weather
+
+app.intent('showWeatherIntent',
+{
+	"slots": {},
+	"utterances":[
+		"to show me the weather",
+		"to show me weather",
+		"to show weather",
+	]
+},
+	function(alexaReq, alexaRes) {
+		var amzUserId, session, sessionCode;
+
+		if (alexaReq.hasSession()) {
+			session = alexaReq.getSession();
+			amzUserId = session.details.userId;
+		}
+		return User.findOne({amzUserId: amzUserId}, function(err, resSession) {
+			if (resSession) {
+				session.set('sessionCode', resSession.sessionCode);
+				sessionCode = resSession.sessionCode;
+			}
+		}).then(function() {
+			var reqOptions = {
+				method: 'POST',
+				uri: client_uri + 'apps/weather/open/',
+				headers: {
+					sessionCode: sessionCode
+				},
+				json: true
+			};
+			return requestPromise(reqOptions)
+				.then(function(jsonRes) {
+					alexaRes
+						.say("")
+						.shouldEndSession(true);
+				}).catch(function(err) {
+					console.log(err);
+					alexaRes
+						.say("Dash is having trouble opening weather.")
+						.shouldEndSession(true);
+				});
+		})
+	}
+)
+
+
+// Twenty-One
 app.intent('OpenTwentyOneIntent', 
 	{
 		"slots": {},
