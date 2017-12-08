@@ -120,9 +120,12 @@ app.intent('OpenTwentyOneIntent',
 	{
 		"slots": {},
 		"utterances":[
-			"Open Twenty One",
-			"Open blackjack",
-			"Open black jack"
+			"to show me twenty one",
+			"to show me blackjack",
+			"to play twenty one",
+			"to play blackjack",
+			"I want to play blackjack",
+			"I want to play twenty one",
 		]
 	},
 	ShowTwentyOne
@@ -133,9 +136,8 @@ app.intent('DealTwentyOneIntent',
 		"slots": {},
 		"utterances":[
 			"Deal",
-			"New game",
+			"start a new game",
 			"Deal cards",
-			"New hand"
 		]
 	},
 	DealTwentyOne
