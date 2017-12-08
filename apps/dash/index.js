@@ -16,9 +16,28 @@ var db_uri = process.env.DB_URI;
 var mongoose = require("mongoose");
 var User = require('./models/User');
 
+mongoose.Promise = Promise;
 mongoose.connect(db_uri, {useMongoClient: true}, function(err) {
 	if (err) console.log("Mongoose error: " + err);
 });
+
+// Session Manager Intents
+var ConnectSession = require('./Intents/SessionManagement/ConnectSession')
+var GetSession = require('./Intents/SessionManagement/GetSession')
+var SetLocation = require('./Intents/SessionManagement/SetLocation')
+
+// Weather Intents
+var ShowWeather = require('./Intents/Weather/ShowWeather')
+
+// GDAX Intents
+var ShowGdax = require('./Intents/Gdax/ShowGdax')
+
+// Twenty One Intents
+var ShowTwentyOne = require('./Intents/TwentyOne/ShowTwentyOne')
+var DealTwentyOne = require('./Intents/TwentyOne/DealTwentyOne')
+var HitTwentyOne = require('./Intents/TwentyOne/HitTwentyOne')
+var StandTwentyOne = require('./Intents/TwentyOne/StandTwentyOne')
+
 
 // Launch
 app.launch(function(alexaReq, alexaRes) {
@@ -50,7 +69,7 @@ app.launch(function(alexaReq, alexaRes) {
 	})
 });
 
-
+// Session Management
 app.intent("ConnectSessionIntent",
 	{
 		"slots":{"connectCode":"AMAZON.FOUR_DIGIT_NUMBER"},
@@ -59,44 +78,7 @@ app.intent("ConnectSessionIntent",
 			"launch code {connectCode}"
 		]
 	},
-	function(alexaReq, alexaRes) {
-		var connectCode = alexaReq.slot('connectCode');
-		var amzUserId;
-
-		if (alexaReq.hasSession()) {
-			var session = alexaReq.getSession();
-			amzUserId = session.details.userId; 
-		}
-
-		var reqOptions = {
-			method: 'POST',
-			uri: client_uri + 'connect',
-			body : {
-				connectCode: connectCode,
-				amzUserId: amzUserId
-			},
-			json: true
-		};
-		return requestPromise(reqOptions)
-			.then(function(jsonRes) {
-				if (jsonRes) {
-					session.set('sessionCode', jsonRes);
-					alexaRes
-						.say("")
-						.shouldEndSession(true);
-				} 
-				if (!jsonRes) {
-					alexaRes
-						.say("Dash has already linked this code to another amazon account.")
-						.shouldEndSession(true);
-				}
-			}).catch(function(err) {
-				console.log(err);
-				alexaRes
-					.say("Dash is having trouble connecting.")
-					.shouldEndSession(true);
-			});
-	}
+	ConnectSession
 )
 
 app.intent('GetSessionIntent',
@@ -111,131 +93,52 @@ app.intent('GetSessionIntent',
 			"What is my session"
 		]
 	},
-	function(alexaReq, alexaRes) {
-		var amzUserId, session;
-
-		if (alexaReq.hasSession()) {
-			session = alexaReq.getSession();
-			amzUserId = session.details.userId;
-		}
-		return User.findOne({amzUserId: amzUserId}, function(err, resSession) {
-			if (resSession) {
-				session.set('sessionCode', resSession.sessionCode);
-			}
-		}).then(function() {
-			if (session.get('sessionCode') !== null) {
-				alexaRes
-					.say("")
-					.shouldEndSession(true);
-			} else {
-				alexaRes
-					.say("You are not connected to a Dash session.")
-					.shouldEndSession(true);
-			}
-		})
-	}
+	GetSession
 )
 
-app.intent('SetCityIntent',
-{
-	"slots": {"location":"AMAZON.AdministrativeArea"},
-	"utterances":[
-		"I am in {location}",
-		"I am located at {location}",
-		"my location is {location}",
-	]
-},
-	function(alexaReq, alexaRes) {
-		var amzUserId, session, sessionCode;
-		var location = alexaReq.slot('location');
-
-		if (alexaReq.hasSession()) {
-			session = alexaReq.getSession();
-			amzUserId = session.details.userId;
-		}
-		return User.findOne({amzUserId: amzUserId}, function(err, resSession) {
-			if (resSession) {
-				session.set('sessionCode', resSession.sessionCode);
-				sessionCode = resSession.sessionCode;
-			}
-		}).then(function() {
-			var reqOptions = {
-				method: 'POST',
-				uri: client_uri + 'apps/weather/changeCity/',
-				headers: {
-					sessionCode: sessionCode
-				},
-				body : {
-					location: location,
-				},
-				json: true
-			}
-			return requestPromise(reqOptions)
-				.then(function(jsonRes) {
-					if (jsonRes !== null) {
-						alexaRes
-							.say("")
-							.shouldEndSession(true);
-					} else {
-						alexaRes
-							.say("Dash was unable to configure location.")
-							.shouldEndSession(true);
-					}
-				}).catch(function(err) {
-					console.log(err);
-					alexaRes
-						.say("Dash is having trouble configuring location;")
-						.shouldEndSession(true);
-				});
-		})
-	}
+app.intent('SetLocationIntent',
+	{
+		"slots": {"location":"AMAZON.AdministrativeArea"},
+		"utterances":[
+			"I am in {location}",
+			"I am located at {location}",
+			"my location is {location}",
+		]
+	},
+	SetLocation
 )
 
 // Weather
+app.intent('ShowWeatherIntent',
+	{
+		"slots": {},
+		"utterances":[
+			"to show me the weather",
+			"to show me weather",
+			"to show weather",
+		]
+	},
+	ShowWeather
+)
 
-app.intent('showWeatherIntent',
-{
-	"slots": {},
-	"utterances":[
-		"to show me the weather",
-		"to show me weather",
-		"to show weather",
-	]
-},
-	function(alexaReq, alexaRes) {
-		var amzUserId, session, sessionCode;
-
-		if (alexaReq.hasSession()) {
-			session = alexaReq.getSession();
-			amzUserId = session.details.userId;
-		}
-		return User.findOne({amzUserId: amzUserId}, function(err, resSession) {
-			if (resSession) {
-				session.set('sessionCode', resSession.sessionCode);
-				sessionCode = resSession.sessionCode;
-			}
-		}).then(function() {
-			var reqOptions = {
-				method: 'POST',
-				uri: client_uri + 'apps/weather/open/',
-				headers: {
-					sessionCode: sessionCode
-				},
-				json: true
-			};
-			return requestPromise(reqOptions)
-				.then(function(jsonRes) {
-					alexaRes
-						.say("")
-						.shouldEndSession(true);
-				}).catch(function(err) {
-					console.log(err);
-					alexaRes
-						.say("Dash is having trouble opening weather.")
-						.shouldEndSession(true);
-				});
-		})
-	}
+// Gdax
+app.intent('ShowGdaxIntent',
+	{
+		"slots":{},
+		"utterances": [
+			"to show me the current bitcoin price",
+			"to show me what bitcoin is at",
+			"to show bitcoin prices",
+			"to show me the current ether price",
+			"to show me what ether is at",
+			"to show ethere prices",
+			"to show me coinbase",
+			"to show coinbase prices",
+			"to show me bitcoin",
+			"to show me ethereum",
+		]
+	},
+	ShowGdax
 )
 
 
@@ -249,300 +152,41 @@ app.intent('OpenTwentyOneIntent',
 			"Open black jack"
 		]
 	},
-	function(alexaReq, alexaRes) {
-		var session, sessionCode;
-		if (alexaReq.hasSession()) {
-			session = alexaReq.getSession();
-			sessionCode = session.get('sessionCode');
-		}
-
-		var reqOptions = {
-			method: 'POST',
-			uri: client_uri + 'apps/blackjack/start',
-			body : {
-				sessionCode: sessionCode
-			},
-			json: true
-		};
-		return requestPromise(reqOptions)
-			.then(function(jsonRes) {
-				if (jsonRes.status === 'started') {
-					alexaRes
-					.say("Opened.")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-				} else {
-					alexaRes
-						.say("Can you repeat your command?")
-						.reprompt("Can you repeat your command?")
-						.shouldEndSession(false);
-				}
-			}).catch(function(err) {
-				console.log(err);
-				alexaRes
-					.say("I am having trouble. <break time='1s'> Can you repeat your command?")
-					.reprompt("Can you repeat your command?")
-					.shouldEndSession(false);
-			});
-	}
-)
-
-app.intent('CloseTwentyOneIntent', 
-{
-	"slots": {},
-	"utterances":[
-		"Close Twenty One",
-		"Close blackjack",
-		"Close black jack"
-	]
-},
-function(alexaReq, alexaRes) {
-	var session, sessionCode;
-	if (alexaReq.hasSession()) {
-		session = alexaReq.getSession();
-		sessionCode = session.get('sessionCode');
-	}
-
-	var reqOptions = {
-		method: 'POST',
-		uri: client_uri + 'apps/blackjack/stop',
-		body : {
-			sessionCode: sessionCode
-		},
-		json: true
-	};
-	return requestPromise(reqOptions)
-		.then(function(jsonRes) {
-			if (jsonRes.status === 'stopped') {
-				alexaRes
-				.say("Closed.")
-				.reprompt("Commands are highlighted in red.")
-				.shouldEndSession(false);
-			} else {
-				alexaRes
-					.say("Can you repeat your command?")
-					.reprompt("Can you repeat your command?")
-					.shouldEndSession(false);
-			}
-		}).catch(function(err) {
-			console.log(err);
-			alexaRes
-				.say("I am having trouble. Can you repeat your command?")
-				.reprompt("Can you repeat your command?")
-				.shouldEndSession(false);
-		});
-	}
+	ShowTwentyOne
 )
 
 app.intent('DealTwentyOneIntent', 
-{
-	"slots": {},
-	"utterances":[
-		"Deal",
-		"New game",
-		"Deal cards",
-		"New hand"
-	]
-},
-function(alexaReq, alexaRes) {
-	var session, sessionCode;
-	if (alexaReq.hasSession()) {
-		session = alexaReq.getSession();
-		sessionCode = session.get('sessionCode');
-	}
-
-	var reqOptions = {
-		method: 'POST',
-		uri: client_uri + 'apps/blackjack/deal',
-		body : {
-			sessionCode: sessionCode
-		},
-		json: true
-	};
-	return requestPromise(reqOptions)
-		.then(function(jsonRes) {
-			console.log(jsonRes)
-			if (jsonRes.result === 'Dealer wins - Blackjack') {
-				alexaRes
-					.say("<speak>Blackjack. <break time='1s' /> Dealer wins.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			} 
-			if (jsonRes.result === 'Player wins - Blackjack') {
-				alexaRes
-					.say("<speak>Blackjack. <break time='1s' /> Player wins.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-			if (jsonRes.result === 'Player lose - Bust') {
-				alexaRes
-					.say("<speak>Bust. <break time='1s' /> Dealer wins.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-			if (jsonRes.result === 'Player wins - dealer bust') {
-				alexaRes
-					.say("<speak>Bust. <break time='1s' /> Player wins.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-			if (jsonRes.result === 'Push') {
-				alexaRes
-					.say("<speak>Push. <break time='1s' /> Game is a draw.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-			if (jsonRes.result === null) {
-				alexaRes
-					.say("<speak><prosody rate='fast'>Good luck.</prosody></speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-		}).catch(function(err) {
-			console.log(err);
-			alexaRes
-				.say("I am having trouble. Can you repeat your command?")
-				.reprompt("Can you repeat your command?")
-				.shouldEndSession(false);
-		});
-	}
+	{
+		"slots": {},
+		"utterances":[
+			"Deal",
+			"New game",
+			"Deal cards",
+			"New hand"
+		]
+	},
+	DealTwentyOne
 )
 
 app.intent('HitTwentyOneIntent', 
-{
-	"slots": {},
-	"utterances":[
-		"Hit",
-	]
-},
-function(alexaReq, alexaRes) {
-	var session, sessionCode;
-	if (alexaReq.hasSession()) {
-		session = alexaReq.getSession();
-		sessionCode = session.get('sessionCode');
-	}
-
-	var reqOptions = {
-		method: 'POST',
-		uri: client_uri + 'apps/blackjack/hit',
-		body : {
-			sessionCode: sessionCode
-		},
-		json: true
-	};
-	return requestPromise(reqOptions)
-		.then(function(jsonRes) {
-			console.log(jsonRes)
-			if (jsonRes.result === 'Dealer wins - Blackjack') {
-				alexaRes
-					.say("<speak>Blackjack. <break time='1s' /> Dealer wins.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			} 
-			if (jsonRes.result === 'Player wins - Blackjack') {
-				alexaRes
-					.say("<speak>Blackjack. <break time='1s' /> Player wins.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-			if (jsonRes.result === 'Player lose - Bust') {
-				alexaRes
-					.say("<speak>Bust. <break time='1s' /> Dealer wins.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-			if (jsonRes.result === 'Player wins - dealer bust') {
-				alexaRes
-					.say("<speak>Bust. <break time='1s' /> Player wins.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-			if (jsonRes.result === 'Push') {
-				alexaRes
-					.say("<speak>Push. <break time='1s' /> Game is a draw.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-			if (jsonRes.result === null) {
-				alexaRes
-					.say(".")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-		}).catch(function(err) {
-			console.log(err);
-			alexaRes
-				.say("I am having trouble. Can you repeat your command?")
-				.reprompt("Can you repeat your command?")
-				.shouldEndSession(false);
-		});
-	}
+	{
+		"slots": {},
+		"utterances":[
+			"Hit",
+		]
+	},
+	HitTwentyOne
 )
 
 app.intent('StandTwentyOneIntent', 
-{
-	"slots": {},
-	"utterances":[
-		"Stand",
-		"Stay",
-	]
-},
-function(alexaReq, alexaRes) {
-	var session, sessionCode;
-	if (alexaReq.hasSession()) {
-		session = alexaReq.getSession();
-		sessionCode = session.get('sessionCode');
-	}
-
-	var reqOptions = {
-		method: 'POST',
-		uri: client_uri + 'apps/blackjack/stand',
-		body : {
-			sessionCode: sessionCode
-		},
-		json: true
-	};
-	return requestPromise(reqOptions)
-		.then(function(jsonRes) {
-			console.log(jsonRes)
-			if (jsonRes.result === 'Dealer wins - Blackjack') {
-				alexaRes
-					.say("<speak>Blackjack. <break time='1s' /> Dealer wins.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			} 
-			if (jsonRes.result === 'Player wins - Blackjack') {
-				alexaRes
-					.say("<speak>Blackjack. <break time='1s' /> Player wins.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-			if (jsonRes.result === 'Player wins - closer to 21') {
-				alexaRes
-					.say("<speak>Player is closer to 21. <break time='1s' /> Player wins.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-			if (jsonRes.result === 'Dealer wins - closer to 21') {
-				alexaRes
-					.say("<speak>Dealer is closer to 21. <break time='1s' /> Dealer wins.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-			if (jsonRes.result === 'Push') {
-				alexaRes
-					.say("<speak>Push. <break time='1s' /> Game is a draw.</speak>")
-					.reprompt("Commands are highlighted in red.")
-					.shouldEndSession(false);
-			}
-		}).catch(function(err) {
-			console.log(err);
-			alexaRes
-				.say("I am having trouble. Can you repeat your command?")
-				.reprompt("Can you repeat your command?")
-				.shouldEndSession(false);
-		});
-	}
+	{
+		"slots": {},
+		"utterances":[
+			"Stand",
+			"Stay",
+		]
+	},
+	StandTwentyOne
 )
 
 app.intent("AMAZON.CancelIntent",
@@ -558,7 +202,6 @@ function(request, response) {
 	}
 )
 
-// Stops skill
 app.intent("AMAZON.StopIntent",
 	{
 		"slots": {},
