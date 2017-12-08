@@ -18,11 +18,15 @@ var ShowApp = function(alexaReq, alexaRes) {
         }
     }).then(function() {
         var endpoint;
+        console.log(app);
         if (app === 'weather') {
             endpoint = 'apps/weather/open/';
         }
         if (app === 'bitcoin' || app === 'ethereum' || app === 'ether' || app === 'coinbase') {
             endpoint = 'apps/gdax/open/'
+        }
+        if (app === 'twenty one' || app === 'blackjack' || app === 'black jack') {
+            endpoint = 'apps/blackjack/open/'
         }
         var reqOptions = {
             method: 'POST',

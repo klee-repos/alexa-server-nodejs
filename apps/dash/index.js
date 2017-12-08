@@ -24,14 +24,10 @@ mongoose.connect(db_uri, {useMongoClient: true}, function(err) {
 var ConnectSession = require('./Intents/SessionManagement/ConnectSession')
 var GetSession = require('./Intents/SessionManagement/GetSession')
 var SetLocation = require('./Intents/SessionManagement/SetLocation')
+
+// Launch
 var Launch = require('./Intents/Launch/Launch')
 var ShowApp = require('./Intents/Launch/ShowApp')
-
-// Weather Intents
-// var ShowWeather = require('./Intents/Weather/ShowWeather')
-
-// GDAX Intents
-// var ShowGdax = require('./Intents/Gdax/ShowGdax')
 
 // Twenty One Intents
 var ShowTwentyOne = require('./Intents/TwentyOne/ShowTwentyOne')
@@ -94,47 +90,11 @@ app.intent('ShowAppIntent',
 	ShowApp
 )
 
-// // Weather
-// app.intent('ShowWeatherIntent',
-// 	{
-// 		"slots": {},
-// 		"utterances":[
-// 			"to show me the weather",
-// 			"to show me weather",
-// 			"to show weather",
-// 		]
-// 	},
-// 	ShowWeather
-// )
-
-// Gdax
-// app.intent('ShowGdaxIntent',
-// 	{
-// 		"slots":{},
-// 		"utterances": [
-// 			"to show me the current bitcoin price",
-// 			"to show me what bitcoin is at",
-// 			"to show bitcoin prices",
-// 			"to show me the current ether price",
-// 			"to show me what ether is at",
-// 			"to show ethere prices",
-// 			"to show me coinbase",
-// 			"to show coinbase prices",
-// 			"to show me bitcoin",
-// 			"to show me ethereum",
-// 		]
-// 	},
-// 	ShowGdax
-// )
-
-
 // Twenty-One
-app.intent('OpenTwentyOneIntent', 
+app.intent('PlayTwentyOneIntent', 
 	{
 		"slots": {},
 		"utterances":[
-			"to show me twenty one",
-			"to show me blackjack",
 			"to play twenty one",
 			"to play blackjack",
 			"I want to play blackjack",
