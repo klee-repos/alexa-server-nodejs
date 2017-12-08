@@ -1,12 +1,11 @@
-// Request promise
-var requestPromise = require('request-promise');
-
 // Alexa App framework
 var alexa = require('alexa-app');
 var app = new alexa.app('dash');
 
 // Use global environmental variables
 var dotenv = require('dotenv').config();
+// Request promise
+var requestPromise = require('request-promise');
 
 // Configuration variables
 var client_uri = process.env.CLIENT_URI || "http://localhost:8080/";
@@ -25,6 +24,7 @@ mongoose.connect(db_uri, {useMongoClient: true}, function(err) {
 var ConnectSession = require('./Intents/SessionManagement/ConnectSession')
 var GetSession = require('./Intents/SessionManagement/GetSession')
 var SetLocation = require('./Intents/SessionManagement/SetLocation')
+var Launch = require('./Intents/Launch/Launch')
 
 // Weather Intents
 var ShowWeather = require('./Intents/Weather/ShowWeather')
@@ -40,34 +40,7 @@ var StandTwentyOne = require('./Intents/TwentyOne/StandTwentyOne')
 
 
 // Launch
-app.launch(function(alexaReq, alexaRes) {
-	var amzUserId, session;
-	var newPlayer = true;
-	
-	if (alexaReq.hasSession()) {
-		var session = alexaReq.getSession();
-		amzUserId = session.details.userId;
-	} 
-
-	return User.findOne({amzUserId: amzUserId}, function(err, resSession) {
-		if (resSession) {
-			newPlayer = false;
-			session.set('sessionCode', resSession.sessionCode);
-		} else {
-			newPlayer = true;
-		}
-	}).then(function() {
-		if (newPlayer) {
-			alexaRes
-				.say("Welcome to Dash. Please tell Dash the 4 digit number on your screen.")
-				.shouldEndSession(true);
-		} else {
-			alexaRes
-				.say("Connected to Dash. Please tell Dash a command.")
-				.shouldEndSession(true);
-		}
-	})
-});
+app.launch(Launch)
 
 // Session Management
 app.intent("ConnectSessionIntent",
