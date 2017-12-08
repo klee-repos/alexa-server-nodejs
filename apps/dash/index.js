@@ -14,7 +14,7 @@ var db_uri = process.env.DB_URI;
 
 // Connection to MongoDB Altas via mongoose
 var mongoose = require("mongoose");
-var Session = require('./models/Session');
+var User = require('./models/User');
 
 mongoose.connect(db_uri, {useMongoClient: true}, function(err) {
 	if (err) console.log("Mongoose error: " + err);
@@ -30,7 +30,7 @@ app.launch(function(alexaReq, alexaRes) {
 		amzUserId = session.details.userId;
 	} 
 
-	return Session.findOne({amzUserId: amzUserId}, function(err, resSession) {
+	return User.findOne({amzUserId: amzUserId}, function(err, resSession) {
 		if (resSession) {
 			newPlayer = false;
 			sessionCode = resSession.sessionCode;
@@ -113,30 +113,91 @@ app.intent('GetSessionIntent',
 		]
 	},
 	function(alexaReq, alexaRes) {
-		var amzUserId, sessionCode;
+		var amzUserId, session;
+
 		if (alexaReq.hasSession()) {
-			var session = alexaReq.getSession();
+			session = alexaReq.getSession();
 			amzUserId = session.details.userId;
 		} else {
 			console.log("no session");
 		}
-		return Session.findOne({amzUserId: amzUserId}, function(err, resSession) {
+		return User.findOne({amzUserId: amzUserId}, function(err, resSession) {
 			if (resSession) {
 				session.set('sessionCode', resSession.sessionCode);
-				sessionCode = session.get('sessionCode');
 			} else {
 				console.log('no session found')
 			}
 		}).then(function() {
-			if (sessionCode) {
+			if (session.get('sessionCode') !== null) {
 				alexaRes
-					.say("You are connected to " + sessionCode + ".")
+					.say("You are connected to a session.")
 					.shouldEndSession(true);
 			} else {
 				alexaRes
 					.say("You are not connected to a session.")
 					.shouldEndSession(true);
 			}
+		})
+	}
+)
+
+app.intent('SetCityIntent',
+{
+	"slots": {"location":"AMAZON.AdministrativeArea"},
+	"utterances":[
+		"I am in {location}",
+		"I am located at {location}",
+		"my location is {location}",
+	]
+},
+	function(alexaReq, alexaRes) {
+		var amzUserId, session, sessionCode;
+		var location = alexaReq.slot('location');
+
+		if (alexaReq.hasSession()) {
+			session = alexaReq.getSession();
+			amzUserId = session.details.userId;
+		} else {
+			console.log("no session");
+		}
+
+		return User.findOne({amzUserId: amzUserId}, function(err, resSession) {
+			if (resSession) {
+				session.set('sessionCode', resSession.sessionCode);
+				sessionCode = resSession.sessionCode;
+			} else {
+				console.log('no session found')
+			}
+		}).then(function() {
+			var reqOptions = {
+				method: 'POST',
+				uri: client_uri + 'apps/weather/changeCity/',
+				headers: {
+					sessionCode: sessionCode
+				},
+				body : {
+					location: location,
+				},
+				json: true
+			};
+			return requestPromise(reqOptions)
+				.then(function(jsonRes) {
+					if (jsonRes !== null) {
+						console.log(jsonRes)
+						alexaRes
+							.say("Location configured.")
+							.shouldEndSession(true);
+					} else {
+						alexaRes
+							.say("Unable to configure location.")
+							.shouldEndSession(true);
+					}
+				}).catch(function(err) {
+					console.log(err);
+					alexaRes
+						.say("I am having trouble configuring location;")
+						.shouldEndSession(true);
+				});
 		})
 	}
 )
