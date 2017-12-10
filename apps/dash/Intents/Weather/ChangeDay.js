@@ -3,8 +3,9 @@ var User = require('../../models/User');
 var client_uri = process.env.CLIENT_URI || "http://localhost:8080/";
 var requestPromise = require('request-promise');
 
-var ShowWeather = function(alexaReq, alexaRes) {
+var ChangeDay = function(alexaReq, alexaRes) {
     var amzUserId, session, sessionCode;
+    var day = alexaReq.slot('Day');
 
     if (alexaReq.hasSession()) {
         session = alexaReq.getSession();
@@ -18,24 +19,33 @@ var ShowWeather = function(alexaReq, alexaRes) {
     }).then(function() {
         var reqOptions = {
             method: 'POST',
-            uri: client_uri + 'apps/weather/open/',
+            uri: client_uri + 'apps/weather/changeActiveDay/',
             headers: {
                 sessionCode: sessionCode
             },
+            body : {
+                day: day,
+            },
             json: true
-        };
+        }
         return requestPromise(reqOptions)
             .then(function(jsonRes) {
-                alexaRes
-                    .say("")
-                    .shouldEndSession(true);
+                if (jsonRes !== null) {
+                    alexaRes
+                        .say("")
+                        .shouldEndSession(true);
+                } else {
+                    alexaRes
+                        .say("Dash was unable to change the forecast.")
+                        .shouldEndSession(true);
+                }
             }).catch(function(err) {
                 console.log(err);
                 alexaRes
-                    .say("Dash is having trouble opening weather.")
+                    .say("Dash is having trouble configuring weather;")
                     .shouldEndSession(true);
             });
     })
 }
 
-module.exports = ShowWeather;
+module.exports = ChangeDay;

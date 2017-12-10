@@ -29,6 +29,9 @@ var SetLocation = require('./Intents/SessionManagement/SetLocation')
 var Launch = require('./Intents/Launch/Launch')
 var ShowApp = require('./Intents/Launch/ShowApp')
 
+// Weather
+var ChangeDay = require('./Intents/Weather/ChangeDay')
+
 // Twenty One Intents
 var ShowTwentyOne = require('./Intents/TwentyOne/ShowTwentyOne')
 var DealTwentyOne = require('./Intents/TwentyOne/DealTwentyOne')
@@ -88,6 +91,17 @@ app.intent('ShowAppIntent',
 		]
 	},
 	ShowApp
+)
+
+app.intent('ChangeDayIntent',
+	{
+		"slots": {"Day":"AMAZON.DayOfWeek"},
+		"utterances": [
+			"to show the forecast for {Day}",
+			"to show me the weather for {Day}"
+		]
+	},
+	ChangeDay
 )
 
 // Twenty-One
